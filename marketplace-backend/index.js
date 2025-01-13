@@ -1,40 +1,36 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { User } = require('./models');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { User } = require('./models');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post('/register', async (req, res) => {
-  try {
+// Testroute, um zu prüfen, ob der Server läuft
+app.get('/', (req, res) => {
+    res.send('Backend läuft erfolgreich!');
+});
+
+// Benutzer registrieren
+app.post('/api/register', async (req, res) => {
     const { email, password, address } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword, address });
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Fehler beim Erstellen des Benutzers' });
-  }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await User.create({ email, password: hashedPassword, address });
+        res.status(201).json({ message: 'Benutzer erfolgreich registriert', user: newUser });
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            res.status(400).json({ error: 'Benutzer mit dieser Email existiert bereits' });
+        } else {
+            res.status(500).json({ error: 'Fehler bei der Registrierung' });
+        }
+    }
 });
 
-app.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ error: 'Benutzer nicht gefunden' });
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: 'Ungültige Anmeldedaten' });
-
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ error: 'Fehler bei der Anmeldung' });
-  }
-});
-
-app.listen(3000, () => console.log('Server läuft auf Port 3000'));
+// Server starten
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));

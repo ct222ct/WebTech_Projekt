@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -23,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
         </mat-form-field>
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Adresse</mat-label>
-          <input matInput [(ngModel)]="user.address" name="address" />
+          <input matInput [(ngModel)]="user.address" name="address" required />
         </mat-form-field>
         <button mat-raised-button color="primary" type="submit">Registrieren</button>
       </form>
@@ -45,7 +46,12 @@ import { MatButtonModule } from '@angular/material/button';
 export class RegisterComponent {
   user = { email: '', password: '', address: '' };
 
+  constructor(private http: HttpClient) {}
+
   register() {
-    console.log('Registrierung erfolgreich:', this.user);
+    this.http.post('http://localhost:3000/api/register', this.user).subscribe(
+      response => console.log('Registrierung erfolgreich', response),
+      error => console.error('Fehler bei der Registrierung', error)
+    );
   }
 }
