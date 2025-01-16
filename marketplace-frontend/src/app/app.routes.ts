@@ -9,4 +9,9 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'account', component: AccountComponent }, // Benutzerverwaltung
+  {path: 'vehicles',
+    loadComponent: () =>
+      import('./vehicle-marketplace/vehicles.component').then((m) => m.VehiclesComponent),
+  },
+
 ];

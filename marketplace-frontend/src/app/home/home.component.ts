@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="home">
       <header class="header">
@@ -29,6 +30,7 @@ import { CommonModule } from '@angular/common';
         <div class="category">
           <img src="/assets/icons/cars.png" alt="Fahrzeuge" />
           <p>Fahrzeuge</p>
+          <button class="navigate-button" (click)="goToVehicles()">Zur Fahrzeugseite</button>
         </div>
       </div>
 
@@ -98,6 +100,20 @@ import { CommonModule } from '@angular/common';
         font-weight: bold;
       }
 
+      .navigate-button {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .navigate-button:hover {
+        background-color: #218838;
+      }
+
       .footer {
         margin-top: 50px;
         font-size: 0.8em;
@@ -106,4 +122,9 @@ import { CommonModule } from '@angular/common';
     `,
   ],
 })
-export class HomeComponent {}
+export class HomeComponent {
+  goToVehicles() {
+    // Replace '/vehicles' with the actual route for the vehicle page
+    window.location.href = '/vehicles';
+  }
+}

@@ -2,10 +2,10 @@ import { createRequire } from 'module';const require = createRequire(import.meta
 import {
   MatCommonModule,
   Platform
-} from "./chunk-F7GV2JPC.js";
+} from "./chunk-LGC7UFBG.js";
 import {
   DOCUMENT
-} from "./chunk-WEC3A5L3.js";
+} from "./chunk-IXDBT2EF.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -28,10 +28,10 @@ import {
   ɵɵprojection,
   ɵɵprojectionDef,
   ɵɵqueryRefresh
-} from "./chunk-6JA6SQ4L.js";
+} from "./chunk-U4TTSKPH.js";
 import "./chunk-YHCV7DAQ.js";
 
-// node_modules/@angular/material/fesm2022/toolbar.mjs
+// ../../node_modules/@angular/material/fesm2022/toolbar.mjs
 var _c0 = ["*", [["mat-toolbar-row"]]];
 var _c1 = ["*", "mat-toolbar-row"];
 var MatToolbarRow = class _MatToolbarRow {
