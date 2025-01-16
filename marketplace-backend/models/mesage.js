@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('./index');
+const sequelize = require('../index');
 const User = require('./user');
-const Vehicle = require('./vehicle/vehicle');
+const Vehicle = require('./vehicle');
 
 const Message = sequelize.define('Message', {
     content: {

@@ -1,15 +1,39 @@
 const express = require('express');
 const multer = require('multer');
-const { Vehicle, Model, VehicleType } = require('../models');
+const { Vehicle, Model, VehicleType } = require('../models/vehicle/vehicle');
 const router = express.Router();
-
-const upload = multer({ dest: 'uploads/' }); // Für Bild-Uploads
+const auth = require('../middlewares/auth');
 
 const { check, validationResult } = require('express-validator');
+const path = require('path');
 
-router.post(
-    '/',
-    [
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb('Error: Images Only!');
+    }
+  },
+});
+
+
+// Create a new vehicle
+router.post('/', auth,  upload.array('pictures', 5), [
       check('name').isString().notEmpty(),
       check('price').isFloat({ min: 0 }),
       check('registrationDate').isISO8601(),
@@ -17,12 +41,12 @@ router.post(
       check('fuelType').isIn(['Petrol', 'Diesel', 'Electric']),
     ],
     async (req, res) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-      // Vehicle creation logic
       try {
+        const { name, description, price, registrationDate, mileage, fuelType, color, condition, modelId, typeId } =
+            req.body;
+
+        const pictures = req.files.map((file) => file.path);
+
         const vehicle = await Vehicle.create({
           name,
           description,
@@ -34,8 +58,9 @@ router.post(
           condition,
           modelId,
           typeId,
-          pictures: req.files.map(file => file.path), // Bildpfade speichern
+          pictures,
         });
+
         res.status(201).json(vehicle);
       } catch (err) {
         res.status(400).json({ error: err.message });

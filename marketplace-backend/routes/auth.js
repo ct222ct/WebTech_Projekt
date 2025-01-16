@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User } = require('../models/index2');
 const router = express.Router();
 
 const JWT_SECRET = 'your_jwt_secret_key'; // Ersetze mit einem echten Secret

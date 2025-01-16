@@ -6,7 +6,7 @@ import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 import { AccountComponent } from './account/account.component';
 import {VehicleMarketplaceComponent} from './vehicle-marketplace/vehicle-marketplace.component';
-import {AuthGuard} from './auth.guard';
+import {AuthGuard} from './auth/auth.guard';
 import {VehicleDetailComponent} from './vehicle-marketplace/vehicle-detail.component';
 import {CommonModule} from '@angular/common'; // Neue Komponente für Benutzerverwaltung
 

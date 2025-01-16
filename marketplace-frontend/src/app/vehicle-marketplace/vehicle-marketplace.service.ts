@@ -31,5 +31,9 @@ export class VehicleMarketplaceService {
   getVehicle(vehicleId: number) {
     return this.http.get(`${this.apiUrl}/${vehicleId}`);
   }
+  addVehicle(formData: FormData) {
+    return this.http.post(`${this.apiUrl}/`, formData);
+  }
+
 
 }

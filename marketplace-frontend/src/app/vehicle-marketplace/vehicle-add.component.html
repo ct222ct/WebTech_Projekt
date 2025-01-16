@@ -1,0 +1,18 @@
+<div>
+  <h1>Add Vehicle</h1>
+  <form (submit)="addVehicle()">
+    <input type="text" [(ngModel)]="vehicle.name" placeholder="Name" required />
+    <textarea [(ngModel)]="vehicle.description" placeholder="Description"></textarea>
+    <input type="number" [(ngModel)]="vehicle.price" placeholder="Price" required />
+    <input type="date" [(ngModel)]="vehicle.registrationDate" placeholder="Registration Date" required />
+    <input type="number" [(ngModel)]="vehicle.mileage" placeholder="Mileage" required />
+    <input type="text" [(ngModel)]="vehicle.color" placeholder="Color" />
+    <select [(ngModel)]="vehicle.condition">
+      <option value="new">New</option>
+      <option value="used">Used</option>
+      <option value="broken">Broken</option>
+    </select>
+    <input type="file" (change)="onFileChange($event)" multiple />
+    <button type="submit">Add Vehicle</button>
+  </form>
+</div>

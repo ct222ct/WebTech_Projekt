@@ -1,19 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { VehicleMarketplaceService } from './vehicle-marketplace.service';
 import {FormsModule} from '@angular/forms';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-vehicle-marketplace',
-  standalone: true,
   templateUrl: './vehicle-marketplace.component.html',
   styleUrls: ['./vehicle-marketplace.component.less'],
   imports: [
-    CommonModule,
     FormsModule,
-    // Für Template-Funktionen wie *ngFor
-  ],
-  })
+    NgForOf
+  ]
+})
 export class VehicleMarketplaceComponent implements OnInit {
   vehicles: any[] = [];
   totalVehicles: number = 0;
@@ -38,17 +36,15 @@ export class VehicleMarketplaceComponent implements OnInit {
   loadVehicles(): void {
     this.vehicleService
       .searchVehicles(this.currentPage, this.vehiclesPerPage, this.filters)
-      .subscribe(
-        (response: any) => {
-          this.vehicles = response.data;
-          this.totalVehicles = response.total;
-        },
-        (error) => {
-          alert('Failed to load vehicles. Please try again later.');
-        }
-      );
+      .subscribe((response: any) => {
+        this.vehicles = response.data;
+        this.totalVehicles = response.total;
+      },
+    (error) => {
+      alert('Failed to load vehicles. Please try again later.');
+    }
+  );
   }
-
 
   onPageChange(page: number): void {
     this.currentPage = page;
@@ -61,6 +57,4 @@ export class VehicleMarketplaceComponent implements OnInit {
   }
 
   protected readonly Math = Math;
-
-
 }

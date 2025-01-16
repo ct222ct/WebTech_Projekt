@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { VehicleMarketplaceService } from './vehicle-marketplace.service';
+import { VehicleMarketplaceService } from '../vehicle-marketplace/vehicle-marketplace.service';
 import {NgIf} from '@angular/common';
 
 @Component({
@@ -26,4 +26,3 @@ export class VehicleDetailComponent implements OnInit {
     });
   }
 }
-

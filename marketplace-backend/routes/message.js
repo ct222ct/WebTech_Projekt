@@ -1,5 +1,5 @@
 const express = require('express');
-const { Message, Vehicle, User } = require('../models');
+const { Message, Vehicle, User } = require('../models/index2');
 const router = express.Router();
 
 // Get messages for a specific vehicle and user

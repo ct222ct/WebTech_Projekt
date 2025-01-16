@@ -1,25 +1,14 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../index');
+const sequelize = require('../index2');
 const Category = require('./category');
 
-module.exports = (sequelize, DataTypes) => {
-  const VehicleType = sequelize.define('VehicleType', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Categories',
-        key: 'id',
-      },
-    },
-  });
+const VehicleType = sequelize.define('VehicleType', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
-  VehicleType.associate = (models) => {
-    VehicleType.belongsTo(models.Category, { foreignKey: 'categoryId' });
-  };
+VehicleType.belongsTo(Category, { foreignKey: 'categoryId' });
 
-  return VehicleType;
-};
+module.exports = VehicleType;

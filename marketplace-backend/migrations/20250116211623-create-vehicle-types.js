@@ -16,7 +16,7 @@ module.exports = {
       categoryId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Categories', // Fremdschlüssel zur Tabelle Categories
+          model: 'Categories',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -33,7 +33,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('VehicleTypes');
   },
 };
