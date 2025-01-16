@@ -31,6 +31,9 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+const vehicleRoutes = require('./routes/vehicle');
+app.use('/api/vehicles', vehicleRoutes);
+
 // Server starten
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));

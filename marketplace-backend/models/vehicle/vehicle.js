@@ -1,20 +1,44 @@
-'use strict';
-module.exports = (sequelize, DataTypes) => {
-  const Vehicle = sequelize.define('Vehicle', {
-    name: { type: DataTypes.STRING, allowNull: false },
-    modelId: { type: DataTypes.INTEGER, allowNull: false },
-    typeId: { type: DataTypes.INTEGER, allowNull: false },
-    price: { type: DataTypes.DECIMAL, allowNull: false },
-    description: { type: DataTypes.TEXT },
-    registrationDate: { type: DataTypes.DATE },
-    mileage: { type: DataTypes.INTEGER },
-    fuel: { type: DataTypes.STRING },
-    color: { type: DataTypes.STRING },
-    condition: { type: DataTypes.STRING },
-  });
-  Vehicle.associate = function(models) {
-    Vehicle.belongsTo(models.Model, { foreignKey: 'modelId' });
-    Vehicle.belongsTo(models.Type, { foreignKey: 'typeId' });
-  };
-  return Vehicle;
-};
+const { DataTypes } = require('sequelize');
+const sequelize = require('../index');
+const Model = require('./model');
+const VehicleType = require('./type');
+
+const Vehicle = sequelize.define('Vehicle', {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+    },
+    registrationDate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    mileage: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    fuelType: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    color: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    condition: {
+        type: DataTypes.ENUM('new', 'used', 'broken'),
+        allowNull: false,
+    },
+});
+
+Vehicle.belongsTo(Model, { foreignKey: 'modelId' });
+Vehicle.belongsTo(VehicleType, { foreignKey: 'typeId' });
+
+module.exports = Vehicle;

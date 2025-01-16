@@ -1,6 +1,6 @@
 import {
   MatCommonModule
-} from "./chunk-5C57JC7Q.js";
+} from "./chunk-WS3QSNJG.js";
 import "./chunk-QNBI566I.js";
 import {
   ChangeDetectionStrategy,

@@ -11,5 +11,8 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes),
     provideHttpClient(withFetch()),
     BrowserAnimationsModule, provideAnimationsAsync(),
+    provideHttpClient(
+      withFetch() // Aktiviert Fetch für bessere SSR-Leistung
+    ),
   ],
 }).catch(err => console.error(err));

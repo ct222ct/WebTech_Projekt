@@ -1,17 +1,14 @@
-'use strict';
-module.exports = (sequelize, DataTypes) => {
-  const Model = sequelize.define('Model', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    markId: {
-      type: DataTypes.INTEGER,
-      references: { model: 'Marks', key: 'id' },
-    },
-  }, {});
-  Model.associate = function(models) {
-    Model.belongsTo(models.Mark, { foreignKey: 'markId' });
-  };
-  return Model;
-};
+const { DataTypes } = require('sequelize');
+const sequelize = require('../index');
+const Mark = require('./mark');
+
+const Model = sequelize.define('Model', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+Model.belongsTo(Mark, { foreignKey: 'markId' });
+
+module.exports = Model;

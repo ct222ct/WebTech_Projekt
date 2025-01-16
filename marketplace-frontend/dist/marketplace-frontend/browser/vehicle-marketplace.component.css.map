@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/vehicle-marketplace/C:/Apache24/htdocs/Projekt/WebTech_Projekt/marketplace-frontend/src/app/vehicle-marketplace/vehicle-marketplace.component.less"],
+  "sourcesContent": ["form {\n  display: flex;\n  flex-direction: column;\n  gap: 1rem;\n}\n\nlabel {\n  font-weight: bold;\n}\n\nselect {\n  padding: 0.5rem;\n  font-size: 1rem;\n}\n"],
+  "mappings": ";AAAA;AACE,WAAA;AACA,kBAAA;AACA,OAAA;;AAGF;AACE,eAAA;;AAGF;AACE,WAAA;AACA,aAAA;;",
+  "names": []
+}

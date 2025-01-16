@@ -25,4 +25,6 @@ import { MatButtonModule } from '@angular/material/button';
     `,
   ],
 })
-export class AppComponent {}
+export class AppComponent {
+  title: string = 'My App Title'; // Correct declaration of the 'title' property
+}

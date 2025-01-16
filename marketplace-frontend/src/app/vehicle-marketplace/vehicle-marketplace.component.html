@@ -1,0 +1,28 @@
+<div>
+  <h1>Vehicle Marketplace</h1>
+  <form>
+    <!-- Kategorie-Auswahl -->
+    <label for="category">Category:</label>
+    <select id="category" (change)="onCategoryChange($event)">
+      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+    </select>
+
+    <!-- Marke-Auswahl -->
+    <label for="mark">Mark:</label>
+    <select id="mark" (change)="onMarkChange($event)">
+      <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+    </select>
+
+    <!-- Modell-Auswahl -->
+    <label for="model">Model:</label>
+    <select id="model">
+      <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+    </select>
+
+    <!-- Fahrzeugtyp-Auswahl -->
+    <label for="type">Type:</label>
+    <select id="type">
+      <option *ngFor="let type of vehicleTypes" [value]="type.id">{{ type.name }}</option>
+    </select>
+  </form>
+</div>
