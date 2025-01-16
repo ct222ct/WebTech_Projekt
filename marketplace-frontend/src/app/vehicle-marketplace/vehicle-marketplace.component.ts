@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VehicleMarketplaceService } from './vehicle-marketplace.service';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-vehicle-marketplace',
@@ -8,49 +9,58 @@ import { VehicleMarketplaceService } from './vehicle-marketplace.service';
   templateUrl: './vehicle-marketplace.component.html',
   styleUrls: ['./vehicle-marketplace.component.less'],
   imports: [
-    CommonModule, // Für Template-Funktionen wie *ngFor
+    CommonModule,
+    FormsModule,
+    // Für Template-Funktionen wie *ngFor
   ],
   })
 export class VehicleMarketplaceComponent implements OnInit {
-  categories: any[] = [];
-  marks: any[] = [];
-  models: any[] = [];
-  vehicleTypes: any[] = [];
-  selectedCategory: number | null = null;
-  selectedMark: number | null = null;
-  selectedModel: number | null = null;
-  selectedType: number | null = null;
+  vehicles: any[] = [];
+  totalVehicles: number = 0;
+  currentPage: number = 1;
+  vehiclesPerPage: number = 10;
+
+  filters = {
+    name: '',
+    model: null,
+    type: null,
+    priceMin: null,
+    priceMax: null,
+    condition: null,
+  };
 
   constructor(private vehicleService: VehicleMarketplaceService) {}
 
-  ngOnInit(): void { // OnInit-Methode
-    this.vehicleService.getCategories().subscribe((categories: any) => {
-      this.categories = categories;
-    });
+  ngOnInit(): void {
+    this.loadVehicles();
   }
 
-  onCategoryChange(event: Event): void {
-    const target = event.target as HTMLSelectElement; // Explizit typisieren
-    const categoryId = Number(target.value); // Konvertiere den Wert in eine Zahl
-    this.selectedCategory = categoryId;
-
-    this.vehicleService.getMarks(categoryId).subscribe((marks: any) => {
-      this.marks = marks;
-    });
-
-    this.vehicleService.getVehicleTypes(categoryId).subscribe((types: any) => {
-      this.vehicleTypes = types;
-    });
+  loadVehicles(): void {
+    this.vehicleService
+      .searchVehicles(this.currentPage, this.vehiclesPerPage, this.filters)
+      .subscribe(
+        (response: any) => {
+          this.vehicles = response.data;
+          this.totalVehicles = response.total;
+        },
+        (error) => {
+          alert('Failed to load vehicles. Please try again later.');
+        }
+      );
   }
 
-  onMarkChange(event: Event): void {
-    const target = event.target as HTMLSelectElement; // Explizit typisieren
-    const markId = Number(target.value); // Konvertiere den Wert in eine Zahl
-    this.selectedMark = markId;
 
-    this.vehicleService.getModels(markId).subscribe((models: any) => {
-      this.models = models;
-    });
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadVehicles();
   }
+
+  onFilterChange(): void {
+    this.currentPage = 1; // Zurück zur ersten Seite
+    this.loadVehicles();
+  }
+
+  protected readonly Math = Math;
+
 
 }

@@ -1,28 +1,34 @@
 <div>
   <h1>Vehicle Marketplace</h1>
-  <form>
-    <!-- Kategorie-Auswahl -->
-    <label for="category">Category:</label>
-    <select id="category" (change)="onCategoryChange($event)">
-      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-    </select>
 
-    <!-- Marke-Auswahl -->
-    <label for="mark">Mark:</label>
-    <select id="mark" (change)="onMarkChange($event)">
-      <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+  <!-- Filter Form -->
+  <form (ngSubmit)="onFilterChange()">
+    <input type="text" placeholder="Name" [(ngModel)]="filters.name" name="name" />
+    <input type="number" placeholder="Min Price" [(ngModel)]="filters.priceMin" name="priceMin" />
+    <input type="number" placeholder="Max Price" [(ngModel)]="filters.priceMax" name="priceMax" />
+    <select [(ngModel)]="filters.condition" name="condition">
+      <option [value]="null">All Conditions</option>
+      <option value="new">New</option>
+      <option value="used">Used</option>
+      <option value="broken">Broken</option>
     </select>
-
-    <!-- Modell-Auswahl -->
-    <label for="model">Model:</label>
-    <select id="model">
-      <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
-    </select>
-
-    <!-- Fahrzeugtyp-Auswahl -->
-    <label for="type">Type:</label>
-    <select id="type">
-      <option *ngFor="let type of vehicleTypes" [value]="type.id">{{ type.name }}</option>
-    </select>
+    <button type="submit">Filter</button>
   </form>
+
+  <!-- Vehicle List -->
+  <div *ngFor="let vehicle of vehicles">
+    <h2>{{ vehicle.name }}</h2>
+    <p>{{ vehicle.description }}</p>
+    <p>Price: {{ vehicle.price }}</p>
+  </div>
+
+  <!-- Pagination -->
+  <div>
+    <button
+      *ngFor="let page of [].constructor(Math.ceil(totalVehicles / vehiclesPerPage))"
+      (click)="onPageChange(page + 1)"
+    >
+      {{ page + 1 }}
+    </button>
+  </div>
 </div>

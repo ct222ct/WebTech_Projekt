@@ -2,6 +2,9 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../index');
 const Model = require('./model');
 const VehicleType = require('./type');
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
 
 const Vehicle = sequelize.define('Vehicle', {
     name: {
@@ -40,5 +43,40 @@ const Vehicle = sequelize.define('Vehicle', {
 
 Vehicle.belongsTo(Model, { foreignKey: 'modelId' });
 Vehicle.belongsTo(VehicleType, { foreignKey: 'typeId' });
+const upload = multer({ dest: 'uploads/' });
 
-module.exports = Vehicle;
+// Beispielroute: Liste aller Kategorien
+router.get('/categories', async (req, res) => {
+    try {
+        const categories = await Category.findAll();
+        res.json(categories);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Beispielroute: Fahrzeug erstellen
+router.post('/', upload.array('pictures', 5), async (req, res) => {
+    const { name, description, price, registrationDate, mileage, fuelType, color, condition, modelId, typeId } = req.body;
+
+    try {
+        const vehicle = await Vehicle.create({
+            name,
+            description,
+            price,
+            registrationDate,
+            mileage,
+            fuelType,
+            color,
+            condition,
+            modelId,
+            typeId,
+            pictures: req.files.map(file => file.path),
+        });
+        res.status(201).json(vehicle);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+module.exports = router; // Exportiere den Router

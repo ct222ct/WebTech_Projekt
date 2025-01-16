@@ -1,33 +1,47 @@
 const express = require('express');
 const multer = require('multer');
-const { Vehicle, Model, VehicleType } = require('../models/vehicle');
+const { Vehicle, Model, VehicleType } = require('../models');
 const router = express.Router();
 
 const upload = multer({ dest: 'uploads/' }); // Für Bild-Uploads
 
-// Create a new vehicle
-router.post('/', upload.array('pictures', 5), async (req, res) => {
-  const { name, description, price, registrationDate, mileage, fuelType, color, condition, modelId, typeId } = req.body;
+const { check, validationResult } = require('express-validator');
 
-  try {
-    const vehicle = await Vehicle.create({
-      name,
-      description,
-      price,
-      registrationDate,
-      mileage,
-      fuelType,
-      color,
-      condition,
-      modelId,
-      typeId,
-      pictures: req.files.map(file => file.path), // Bildpfade speichern
-    });
-    res.status(201).json(vehicle);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+router.post(
+    '/',
+    [
+      check('name').isString().notEmpty(),
+      check('price').isFloat({ min: 0 }),
+      check('registrationDate').isISO8601(),
+      check('mileage').isInt({ min: 0 }),
+      check('fuelType').isIn(['Petrol', 'Diesel', 'Electric']),
+    ],
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      // Vehicle creation logic
+      try {
+        const vehicle = await Vehicle.create({
+          name,
+          description,
+          price,
+          registrationDate,
+          mileage,
+          fuelType,
+          color,
+          condition,
+          modelId,
+          typeId,
+          pictures: req.files.map(file => file.path), // Bildpfade speichern
+        });
+        res.status(201).json(vehicle);
+      } catch (err) {
+        res.status(400).json({ error: err.message });
+      }
+    }
+);
 
 // Update a vehicle
 router.put('/:id', async (req, res) => {
@@ -83,32 +97,41 @@ router.get('/seller/:userId', async (req, res) => {
   }
 });
 
-// Search vehicles
+const { Op } = require('sequelize');
+
+// Suche nach Fahrzeugen mit Pagination
 router.get('/search', async (req, res) => {
-  const { name, model, type, priceMin, priceMax, city, registrationStart, registrationEnd, mileage, condition } = req.query;
+  const { page = 1, limit = 10, name, model, type, priceMin, priceMax, condition } = req.query;
 
-  let whereClause = {};
-
+  const whereClause = {};
   if (name) whereClause.name = { [Op.iLike]: `%${name}%` };
   if (model) whereClause.modelId = model;
   if (type) whereClause.typeId = type;
   if (priceMin) whereClause.price = { [Op.gte]: priceMin };
-  if (priceMax) whereClause.price = { [Op.lte]: priceMax };
-  if (registrationStart || registrationEnd) {
-    whereClause.registrationDate = {
-      ...(registrationStart ? { [Op.gte]: registrationStart } : {}),
-      ...(registrationEnd ? { [Op.lte]: registrationEnd } : {}),
-    };
-  }
-  if (mileage) whereClause.mileage = { [Op.lte]: mileage };
+  if (priceMax) whereClause.price = { ...whereClause.price, [Op.lte]: priceMax };
   if (condition) whereClause.condition = condition;
 
+  const offset = (page - 1) * limit;
+
   try {
-    const vehicles = await Vehicle.findAll({ where: whereClause });
-    res.json(vehicles);
+    const vehicles = await Vehicle.findAndCountAll({
+      where: whereClause,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      include: [
+        { model: Model, attributes: ['name'] },
+        { model: VehicleType, attributes: ['name'] },
+      ],
+    });
+    res.json({
+      total: vehicles.count,
+      pages: Math.ceil(vehicles.count / limit),
+      data: vehicles.rows,
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
-module.exports
+
+module.exports = router;

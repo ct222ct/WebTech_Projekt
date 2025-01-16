@@ -24,4 +24,12 @@ export class VehicleMarketplaceService {
   getVehicleTypes(categoryId: number) {
     return this.http.get(`${this.apiUrl}/vehicle-types/${categoryId}`);
   }
+  searchVehicles(page: number, limit: number, filters: any) {
+    let params: any = { page, limit, ...filters };
+    return this.http.get(`${this.apiUrl}/search`, { params });
+  }
+  getVehicle(vehicleId: number) {
+    return this.http.get(`${this.apiUrl}/${vehicleId}`);
+  }
+
 }
