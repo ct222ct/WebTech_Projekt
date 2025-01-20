@@ -1,14 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../index2');
-const Mark = require('./mark');
+module.exports = (sequelize, DataTypes) => {
+  const Model = sequelize.define('Model', {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
 
-const Model = sequelize.define('Model', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-Model.belongsTo(Mark, { foreignKey: 'markId' });
-
-module.exports = Model;
+  return Model;
+};

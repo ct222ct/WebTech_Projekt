@@ -9,6 +9,10 @@ export class VehicleMarketplaceService {
 
   constructor(private http: HttpClient) {}
 
+  getVehicles() {
+    return this.http.get(`${this.apiUrl}`);
+  }
+
   getCategories() {
     return this.http.get(`${this.apiUrl}/categories`);
   }

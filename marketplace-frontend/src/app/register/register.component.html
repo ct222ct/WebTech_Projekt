@@ -1,15 +1,16 @@
-<form (ngSubmit)="register()">
-  <label>
-    E-Mail:
-    <input type="email" [(ngModel)]="user.email" name="email" required />
-  </label>
-  <label>
-    Passwort:
-    <input type="password" [(ngModel)]="user.password" name="password" required />
-  </label>
-  <label>
-    Adresse:
-    <input type="text" [(ngModel)]="user.address" name="address" />
-  </label>
-  <button type="submit">Registrieren</button>
-</form>
+<div class="register-container">
+  <h1>Register</h1>
+  <form (ngSubmit)="register()">
+    <label for="email">Email:</label>
+    <input id="email" type="email" [(ngModel)]="user.email" name="email" required />
+
+    <label for="password">Password:</label>
+    <input id="password" type="password" [(ngModel)]="user.password" name="password" required />
+
+    <label for="address">Address:</label>
+    <input id="address" type="text" [(ngModel)]="user.address" name="address" required />
+
+    <button type="submit">Register</button>
+  </form>
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+</div>

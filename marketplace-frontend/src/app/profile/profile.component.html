@@ -1,1 +1,15 @@
-<p>profile works!</p>
+<div class="profile-container">
+  <h1>My Profile</h1>
+  <form (ngSubmit)="updateProfile()">
+    <label for="email">Email:</label>
+    <input id="email" type="email" [(ngModel)]="user.email" name="email" readonly />
+
+    <label for="address">Address:</label>
+    <input id="address" type="text" [(ngModel)]="user.address" name="address" />
+
+    <label for="password">New Password (optional):</label>
+    <input id="password" type="password" [(ngModel)]="user.password" name="password" />
+
+    <button type="submit">Update Profile</button>
+  </form>
+</div>

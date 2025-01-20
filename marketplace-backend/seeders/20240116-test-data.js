@@ -1,4 +1,4 @@
-const { User, Vehicle, Category, Mark, Model, VehicleType } = require('../models/index2');
+const { User, Vehicle, Category, Mark, Model, VehicleType } = require('../models');
 
 module.exports = {
     async up(queryInterface) {

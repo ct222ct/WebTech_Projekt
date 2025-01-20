@@ -1,13 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../index2');
-console.log('Sequelize Instance:', sequelize);
+module.exports = (sequelize, DataTypes) => {
+  const Category = sequelize.define('Category', {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
 
-
-const Category = sequelize.define('Category', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-module.exports = Category;
+  return Category;
+};

@@ -8,7 +8,8 @@ import { AccountComponent } from './account/account.component';
 import {VehicleMarketplaceComponent} from './vehicle-marketplace/vehicle-marketplace.component';
 import {AuthGuard} from './auth/auth.guard';
 import {VehicleDetailComponent} from './vehicle-marketplace/vehicle-detail.component';
-import {CommonModule} from '@angular/common'; // Neue Komponente für Benutzerverwaltung
+import {CommonModule} from '@angular/common';
+import {ProfileComponent} from './profile/profile.component'; // Neue Komponente für Benutzerverwaltung
 
 export const routes: Routes = [
   { path: '', component: HomeComponent}, // HomeScreen als Standardroute
@@ -17,6 +18,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'account', component: AccountComponent }, // Benutzerverwaltung
   { path: 'vehicle/:id', component: VehicleDetailComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'profile', component: ProfileComponent },
 
   {path: 'vehicles',
     loadComponent: () =>

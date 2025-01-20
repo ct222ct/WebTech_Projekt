@@ -6,7 +6,7 @@ import {
   sequence,
   style,
   ɵPRE_STYLE
-} from "./chunk-SR6URFXQ.js";
+} from "./chunk-FPPJH4DR.js";
 import {
   Injectable,
   RuntimeError,
@@ -14,9 +14,9 @@ import {
   __spreadValues,
   setClassMetadata,
   ɵɵdefineInjectable
-} from "./chunk-DCNR37TJ.js";
+} from "./chunk-XHBH37RM.js";
 
-// ../../node_modules/@angular/animations/fesm2022/browser.mjs
+// node_modules/@angular/animations/fesm2022/browser.mjs
 var LINE_START = "\n - ";
 function invalidTimingValue(exp) {
   return new RuntimeError(3e3, ngDevMode && `The provided timing value "${exp}" is invalid.`);
@@ -4102,4 +4102,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-YPMOSTYX.js.map
+//# sourceMappingURL=chunk-VBQPKDBO.js.map

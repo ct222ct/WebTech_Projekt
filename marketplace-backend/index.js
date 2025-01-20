@@ -1,52 +1,62 @@
 const express = require('express');
-const bodyParser = require('body-parser'); // Falls du body-parser nutzt
-const vehicleRoutes = require('./routes/vehicle'); // Importiere das Fahrzeug-Routenmodul
-const messageRoutes = require('./routes/message'); // Beispiel für ein anderes Modul
-const authRoutes = require('./routes/auth');
-const errorHandler = require('./middlewares/errorHandler');
+const { Sequelize } = require('sequelize');
+const routes = require('./routes'); // Stelle sicher, dass dies auf `routes/index.js` verweist
 
 const app = express();
+const PORT = 3000;
 
-app.use(express.json()); // Middleware für JSON-Parsing
-app.use(bodyParser.urlencoded({ extended: true })); // Falls benötigt
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Verwende die importierten Routenmodule
-app.use('/api/vehicles', vehicleRoutes); // Fahrzeug-Routen
-app.use('/api/messages', messageRoutes); // Nachrichten-Routen (falls vorhanden)
-app.use('/api/auth', authRoutes);
-app.use(errorHandler);
-
-
-// Standard-Port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server läuft auf Port ${PORT}`);
+// Beispiel Sequelize-Instanz
+const sequelize = new Sequelize('marketplace', 'postgres', '1234', {
+    host: 'localhost',
+    dialect: 'postgres',
 });
-
-
-const sequelize = require('./models/index2'); // Verweis auf index2.js
-const Category = require('./models/vehicle/category'); // Verweis auf category.js
 
 (async () => {
     try {
-        // Verbindung testen
         await sequelize.authenticate();
-        console.log('Connection has been established successfully.');
+        console.log('Datenbankverbindung erfolgreich hergestellt.');
 
-        // Datenbank synchronisieren
-        await sequelize.sync({ force: true }); // Achtung: Alle Tabellen werden gelöscht und neu erstellt
-        console.log('Database synchronized.');
+        await sequelize.sync({ alter: true });
+        console.log('Datenbank synchronisiert.');
 
-        // Testeintrag erstellen
-        const newCategory = await Category.create({ name: 'Test Category' });
-        console.log('Category created:', newCategory);
+        // Routen
+        app.use('/api', routes);
 
-        // Alle Kategorien abrufen
-        const categories = await Category.findAll();
-        console.log('Categories:', categories);
+        app.listen(PORT, () => {
+            console.log(`Server läuft auf Port ${PORT}`);
+        });
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
-    } finally {
+        console.error('Fehler bei der Initialisierung:', error);
         await sequelize.close();
     }
 })();
+const cors = require('cors');
+app.use(cors()); // CORS-Middleware aktivieren
+
+const User = require('./models/user'); // Beispiel: Benutzer-Modell
+
+app.post('/api/users/register', async (req, res) => {
+    const { email, password, address } = req.body;
+
+    if (!email || !password || !address) {
+        return res.status(400).json({ message: 'Alle Felder sind erforderlich.' });
+    }
+
+    try {
+        // Benutzer speichern
+        const newUser = await User.create({
+            email: email,
+            password: password,
+            address: address,
+        });
+
+        res.status(201).json({ message: 'Registrierung erfolgreich!', user: newUser });
+    } catch (error) {
+        console.error('Fehler beim Speichern:', error);
+        res.status(500).json({ message: 'Fehler beim Speichern der Registrierung.' });
+    }
+});
