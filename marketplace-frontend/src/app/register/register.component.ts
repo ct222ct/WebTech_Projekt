@@ -24,17 +24,27 @@ export class RegisterComponent {
   constructor(private userService: UserService, private router: Router) {}
 
   register(): void {
+    // Überprüfen, ob alle Felder ausgefüllt sind
+    if (!this.user.email || !this.user.password || !this.user.address) {
+      this.errorMessage = 'All fields are required';
+      return;
+    }
+
     this.userService.register(this.user).subscribe(
-      (response) => {
-        console.log('Antwort vom Server:', response); // Erfolgreiche Antwort
-        alert(response.message); // Zeige die Erfolgsnachricht an
+      () => {
+        alert('Registration successful!');
+        this.router.navigate(['/login']); // Weiterleitung zur Login-Seite
       },
       (error) => {
-        console.error('Fehler bei der Registrierung:', error);
-        this.errorMessage = error.error?.message || 'Registrierung fehlgeschlagen.';
+        if (error.status === 400) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage = 'An error occurred during registration.';
+        }
       }
     );
   }
+
 
 
 }

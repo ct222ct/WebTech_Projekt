@@ -21,4 +21,19 @@ export class UserService {
   updateUser(user: { email?: string; address?: string; password?: string }): Observable<any> {
     return this.http.put(`${this.apiUrl}/profile`, user);
   }
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { email, password });
+  }
+
+  saveToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
 }

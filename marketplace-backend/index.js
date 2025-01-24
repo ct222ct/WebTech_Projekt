@@ -2,11 +2,14 @@ const express = require('express');
 const { sequelize, User } = require('./models'); // User aus models importieren
 const app = express();
 const cors = require('cors');
-
+const userRoutes = require('./routes/user');
 
 app.use(cors()); // CORS-Middleware aktivieren
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+sequelize.sync({ alter: true });
+// Benutzer-Routen registrieren
+app.use('/api/users', userRoutes);
 
 app.post('/api/users/register', async (req, res) => {
     const { email, password, address } = req.body;

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
+import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -8,24 +9,43 @@ import {FormsModule} from '@angular/forms';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.less'],
   imports: [
+    NgIf,
     FormsModule
   ]
 })
 export class LoginComponent {
   email: string = '';
   password: string = '';
+  errorMessage: string | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   login(): void {
-    this.authService.login(this.email, this.password).subscribe(
-      (response: any) => {
-        this.authService.saveToken(response.token);
-        this.router.navigate(['/']);
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Email and password are required';
+      return;
+    }
+
+    this.userService.login(this.email, this.password).subscribe(
+      (response) => {
+        this.userService.saveToken(response.token);
+        alert('Login successful!');
+        this.router.navigate(['/']); // Weiterleitung zur Startseite
       },
       (error) => {
-        alert('Invalid login credentials');
+        console.error('Fehler beim Login:', error);
+
+        if (error.status === 400) {
+          this.errorMessage = 'Email and password are required';
+        } else if (error.status === 401) {
+          this.errorMessage = 'Invalid email or password';
+        } else if (error.status === 500) {
+          this.errorMessage = 'Internal server error occurred during login';
+        } else {
+          this.errorMessage = 'An unknown error occurred during login';
+        }
       }
     );
   }
+
 }
