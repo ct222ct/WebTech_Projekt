@@ -8,10 +8,12 @@ export class AuthService {
   private apiUrl = 'http://localhost:3000/api/auth';
 
   constructor(private http: HttpClient) {}
-
+/*
   register(email: string, password: string, name: string) {
     return this.http.post(`${this.apiUrl}/register`, { email, password, name });
   }
+
+ */
 
   login(email: string, password: string) {
     return this.http.post(`${this.apiUrl}/login`, { email, password });
@@ -26,6 +28,10 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    // Überprüft, ob ein Token im localStorage gespeichert ist
+    return !!localStorage.getItem('token');
+  }
+  logout(): void {
+    localStorage.removeItem('token'); // Token entfernen
   }
 }

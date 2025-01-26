@@ -1,31 +1,69 @@
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './auth/login.component'
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import { AccountComponent } from './account/account.component';
-import {VehicleMarketplaceComponent} from './vehicle-marketplace/vehicle-marketplace.component';
-import {AuthGuard} from './auth/auth.guard';
-import {VehicleDetailComponent} from './vehicle-marketplace/vehicle-detail.component';
-import {CommonModule} from '@angular/common';
-import {ProfileComponent} from './profile/profile.component'; // Neue Komponente für Benutzerverwaltung
+import { AuthGuard } from './auth/auth.guard';
+import { CommonModule } from '@angular/common';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent}, // HomeScreen als Standardroute
-  { path: 'login', component: LoginComponent },
-  //{ path: '**', redirectTo: '', pathMatch: 'full' }, // Alle unbekannten Routen umleiten
-  { path: 'register', component: RegisterComponent },
-  { path: 'account', component: AccountComponent }, // Benutzerverwaltung
-  { path: 'vehicle/:id', component: VehicleDetailComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'profile', component: ProfileComponent },
-
-  {path: 'vehicles',
+  // Startseite (geschützt)
+  {
+    path: '',
     loadComponent: () =>
-      import('./vehicle-marketplace/vehicle-marketplace.component').then((m) => m.VehicleMarketplaceComponent),
+      import('./home/home.component').then((m) => m.HomeComponent),
+    canActivate: [AuthGuard], // Schutz vor unautorisierten Zugriffen
   },
 
+  // Login-Seite
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./login/login.component').then((m) => m.LoginComponent),
+  },
+
+  // Registrierung
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./register/register.component').then((m) => m.RegisterComponent),
+  },
+
+  // Fahrzeug-Marktplatz
+  {
+    path: 'vehicles',
+    loadComponent: () =>
+      import('./vehicle-marketplace/vehicle-marketplace.component').then(
+        (m) => m.VehicleMarketplaceComponent
+      ),
+  },
+
+  // Fahrzeugdetails
+  {
+    path: 'vehicle/:id',
+    loadComponent: () =>
+      import('./vehicle-marketplace/vehicle-detail.component').then(
+        (m) => m.VehicleDetailComponent
+      ),
+  },
+
+  // Benutzerprofil
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./profile/profile.component').then((m) => m.ProfileComponent),
+    canActivate: [AuthGuard], // Nur für authentifizierte Benutzer zugänglich
+  },
+  // Dashboard-Seite
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
+    canActivate: [AuthGuard], // Nur für authentifizierte Benutzer zugänglich
+  },
+
+
+  // Standardroute für unbekannte Pfade
+  { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
 
 @NgModule({
@@ -33,4 +71,3 @@ export const routes: Routes = [
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
-

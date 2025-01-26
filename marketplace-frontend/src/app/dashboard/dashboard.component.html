@@ -1,0 +1,38 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header>
+    <div class="logo">FahrzeugMarkt</div>
+    <nav>
+      <button routerLink="/vehicles">Fahrzeuge</button>
+      <button routerLink="/profile">Mein Profil</button>
+      <button (click)="logout()">Abmelden</button>
+    </nav>
+  </header>
+
+  <!-- Suche -->
+  <div class="search-bar">
+    <input type="text" placeholder="Wonach suchen Sie?" />
+    <button>Suchen</button>
+  </div>
+
+  <!-- Hauptbereich -->
+  <main>
+    <div class="categories">
+      <h2>Kategorien</h2>
+      <div class="category-list">
+        <button routerLink="/vehicles" class="category-item">
+          <img src="assets/cars-icon.png" alt="Autos" />
+          <span>Autos</span>
+        </button>
+        <button routerLink="/vehicles" class="category-item">
+          <img src="assets/motorbikes-icon.png" alt="Motorräder" />
+          <span>Motorräder</span>
+        </button>
+        <button routerLink="/vehicles" class="category-item">
+          <img src="assets/trucks-icon.png" alt="LKWs" />
+          <span>LKWs</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
