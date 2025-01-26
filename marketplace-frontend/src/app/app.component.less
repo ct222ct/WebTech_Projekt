@@ -1,0 +1,45 @@
+.app-container {
+  min-height: 100vh;
+  background-color: white;
+  transition: background-color 0.3s;
+
+  &.logged-in {
+    background-color: #007bff; /* Blau für eingeloggte Benutzer */
+    color: white; /* Ändere die Textfarbe, falls erforderlich */
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: inherit; /* Automatisch die Hintergrundfarbe der App übernehmen */
+
+    nav {
+      display: flex;
+      gap: 15px;
+
+      a {
+        color: inherit; /* Automatisch die Textfarbe der App übernehmen */
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      button {
+        background-color: white;
+        color: #007bff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #0056b3;
+          color: white;
+        }
+      }
+    }
+  }
+}

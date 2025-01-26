@@ -1,3 +1,4 @@
+import { createRequire } from 'module';const require = createRequire(import.meta.url);
 import {
   ApplicationRef,
   Attribute,
@@ -26,13 +27,9 @@ import {
   Renderer2,
   RendererStyleFlags2,
   RuntimeError,
-  Subject,
   TemplateRef,
   Version,
   ViewContainerRef,
-  __async,
-  __spreadProps,
-  __spreadValues,
   booleanAttribute,
   createNgModule,
   findLocaleData,
@@ -60,9 +57,19 @@ import {
   ɵɵinject,
   ɵɵinjectAttribute,
   ɵɵstyleProp
-} from "./chunk-CIYNA5B3.js";
+} from "./chunk-FUFKUDCW.js";
+import {
+  require_cjs
+} from "./chunk-T4XHMJL2.js";
+import {
+  __async,
+  __spreadProps,
+  __spreadValues,
+  __toESM
+} from "./chunk-YHCV7DAQ.js";
 
 // node_modules/@angular/common/fesm2022/common.mjs
+var import_rxjs = __toESM(require_cjs(), 1);
 var _DOM = null;
 function getDOM() {
   return _DOM;
@@ -409,7 +416,7 @@ var HashLocationStrategy = class _HashLocationStrategy extends LocationStrategy 
 })();
 var Location = class _Location {
   /** @internal */
-  _subject = new Subject();
+  _subject = new import_rxjs.Subject();
   /** @internal */
   _basePath;
   /** @internal */
@@ -5123,4 +5130,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-YXEDVI37.js.map
+//# sourceMappingURL=chunk-ICOTJOGS.js.map

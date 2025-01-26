@@ -1,32 +1,36 @@
-import {Component, OnInit} from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import {AuthService} from './services/auth.service';
+import { Component } from '@angular/core';
+import { AuthService } from './services/auth.service';
+import {Router, RouterOutlet} from '@angular/router';
 import {NgIf} from '@angular/common';
+import {MatToolbar} from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterModule, MatToolbarModule, MatButtonModule, NgIf],
   templateUrl: './app.component.html',
-  styles: [
-    `
-      .spacer {
-        flex: 1 1 auto;
-      }
-    `,
-  ],
+  styleUrls: ['./app.component.less'],
+  imports: [
+    NgIf,
+    MatToolbar,
+    RouterOutlet
+  ]
 })
-export class AppComponent implements OnInit {
-  isLoggedIn: boolean = false; // Variable definiert und initialisiert
+export class AppComponent {
+  isLoggedIn: boolean = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Überprüfe den Login-Status beim Laden der App
     this.isLoggedIn = this.authService.isLoggedIn();
+    this.authService.loginStatusChanged.subscribe((status: boolean) => {
+      this.isLoggedIn = status;
+    });
   }
 
-  title = 'marketplace-frontend'; // Titel der App definiert
+  logout(): void {
+    this.authService.logout(); // Setze den Login-Status zurück
+    this.router.navigate(['/login']); // Weiterleitung zur Login-Seite
+  }
+
+  title = 'Marketplace'; // Füge die Eigenschaft hinzu
+
 }
