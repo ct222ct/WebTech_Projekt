@@ -4,21 +4,24 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './auth/auth.guard';
 import { CommonModule } from '@angular/common';
+import {HomeComponent} from './home/home.component';
 
 export const routes: Routes = [
   // Startseite (geschützt)
   {
     path: '',
-    loadComponent: () =>
-      import('./home/home.component').then((m) => m.HomeComponent),
-    canActivate: [AuthGuard], // Schutz vor unautorisierten Zugriffen
+    component: HomeComponent,
+  },
+
+  {
+    path: 'home',
+    component: HomeComponent,
   },
 
   // Login-Seite
   {
     path: 'login',
-    loadComponent: () =>
-      import('./login/login.component').then((m) => m.LoginComponent),
+    component: LoginComponent
   },
 
   // Registrierung
