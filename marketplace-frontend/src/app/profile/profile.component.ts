@@ -1,36 +1,78 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { UserService } from '../services/user.service';
+import { VehicleService } from '../services/vehicle.service';
 import {FormsModule} from '@angular/forms';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.less'],
   imports: [
-    FormsModule
+    FormsModule,
+    NgIf
   ]
 })
-export class ProfileComponent implements OnInit {
-  user = {
+export class ProfileComponent {
+  user: any = {
+    name: '',
     email: '',
     address: '',
-    password: '',
   };
+  vehicles: any[] = [];
+  editProfile: boolean = false;
+  editVehicleId: number | null = null;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    protected userService: UserService,
+    private vehicleService: VehicleService
+  ) {}
 
   ngOnInit(): void {
-    this.userService.getUser().subscribe((data) => {
-      this.user.email = data.email;
-      this.user.address = data.address;
+    this.loadUserData();
+    this.loadVehicles();
+  }
+
+  loadUserData(): void {
+    this.userService.getUserData().subscribe((data) => {
+      this.user = data;// Lade gespeicherte Benutzerdaten
     });
   }
-  updateProfile(): void {
-    const { password, ...updatedUser } = this.user; // Erstellt eine Kopie ohne 'password'
 
-    this.userService.updateUser(updatedUser).subscribe(
-      () => alert('Profile updated successfully!'),
-      (error) => alert('Failed to update profile.')
-    );
+  loadVehicles(): void {
+    this.vehicleService.getUserVehicles().subscribe((data) => {
+      this.vehicles = data;
+    });
+  }
+
+  toggleEditProfile(): void {
+    this.editProfile = !this.editProfile;
+  }
+
+  saveProfile(): void {
+    this.userService.updateUserData(this.user).subscribe(() => {
+      this.editProfile = false;
+      alert('Profil erfolgreich aktualisiert!');
+    });
+  }
+
+  deleteVehicle(vehicleId: number): void {
+    if (confirm('Möchten Sie diese Anzeige wirklich löschen?')) {
+      this.vehicleService.deleteVehicle(vehicleId).subscribe(() => {
+        this.vehicles = this.vehicles.filter((v) => v.id !== vehicleId);
+        alert('Anzeige wurde gelöscht.');
+      });
+    }
+  }
+
+  editVehicle(vehicleId: number): void {
+    this.editVehicleId = vehicleId;
+  }
+
+  saveVehicle(vehicle: any): void {
+    this.vehicleService.updateVehicle(vehicle).subscribe(() => {
+      this.editVehicleId = null;
+      alert('Anzeige erfolgreich aktualisiert!');
+    });
   }
 }

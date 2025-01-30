@@ -32,22 +32,21 @@ export class LoginComponent {
 
   login(): void {
     if (!this.email || !this.password) {
-      this.errorMessage = 'Email and password are required';
+      this.errorMessage = 'Bitte geben Sie E-Mail und Passwort ein.';
       return;
     }
 
     this.userService.login(this.email, this.password).subscribe(
       (response) => {
-        this.userService.saveToken(response.token);
-        this.authService.saveLogin(response.token);
-        alert('Login successful!');
+        localStorage.setItem('token', response.token); // Token speichern
+        alert('Login erfolgreich!');
         this.router.navigate(['/dashboard']); // Weiterleitung zur Dashboard-Seite
       },
       (error) => {
         console.error('Fehler beim Login:', error);
 
         if (error.status === 400) {
-          this.errorMessage = 'Email and password are required';
+          this.errorMessage = 'Ungültige Anmeldedaten. Bitte versuchen Sie es erneut.';
         } else if (error.status === 401) {
           this.errorMessage = 'Invalid email or password';
         } else if (error.status === 500) {

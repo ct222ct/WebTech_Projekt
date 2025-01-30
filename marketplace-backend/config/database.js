@@ -7,4 +7,9 @@ const sequelize = new Sequelize('marketplace', 'postgres', '1234', {
     logging: true, // Optional: Deaktiviert SQL-Logging
 });
 
+sequelize
+    .authenticate()
+    .then(() => console.log('Verbindung zur Datenbank erfolgreich hergestellt'))
+    .catch((err) => console.error('Fehler bei der Verbindung zur Datenbank:', err));
+
 module.exports = sequelize;

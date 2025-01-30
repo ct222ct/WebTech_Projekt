@@ -1,15 +1,27 @@
 <div class="profile-container">
-  <h1>My Profile</h1>
-  <form (ngSubmit)="updateProfile()">
-    <label for="email">Email:</label>
-    <input id="email" type="email" [(ngModel)]="user.email" name="email" readonly />
+  <h2>Mein Profil</h2>
 
-    <label for="address">Address:</label>
-    <input id="address" type="text" [(ngModel)]="user.address" name="address" />
+  <div *ngIf="!editProfile">
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>E-Mail:</strong> {{ user.email }}</p>
+    <p><strong>Adresse:</strong> {{ user.address }}</p>
+    <button (click)="toggleEditProfile()">Profil bearbeiten</button>
+  </div>
 
-    <label for="password">New Password (optional):</label>
-    <input id="password" type="password" [(ngModel)]="user.password" name="password" />
-
-    <button type="submit">Update Profile</button>
-  </form>
+  <div *ngIf="editProfile">
+    <label>
+      Name:
+      <input [(ngModel)]="user.name" />
+    </label>
+    <label>
+      E-Mail:
+      <input [(ngModel)]="user.email" />
+    </label>
+    <label>
+      Adresse:
+      <input [(ngModel)]="user.address" />
+    </label>
+    <button (click)="saveProfile()">Speichern</button>
+    <button (click)="toggleEditProfile()">Abbrechen</button>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
 
@@ -14,37 +14,36 @@ import {NgIf} from '@angular/common';
   ]
 })
 export class RegisterComponent {
-  user = {
-    email: '',
-    password: '',
-    address: '',
-  };
+  name: string = '';
+  email: string = '';
+  password: string = '';
+  address: string = '';
   errorMessage: string | null = null;
 
   constructor(private userService: UserService, private router: Router) {}
 
   register(): void {
-    // Überprüfen, ob alle Felder ausgefüllt sind
-    if (!this.user.email || !this.user.password || !this.user.address) {
-      this.errorMessage = 'All fields are required';
+    if (!this.name || !this.email || !this.password || !this.address) {
+      this.errorMessage = 'Bitte füllen Sie alle Felder aus.';
       return;
     }
 
-    this.userService.register(this.user).subscribe(
+    const newUser = {
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      address: this.address,
+    };
+
+    this.userService.register(newUser).subscribe(
       () => {
-        alert('Registration successful!');
-        this.router.navigate(['/login']); // Weiterleitung zur Login-Seite
+        alert('Registrierung erfolgreich!');
+        this.router.navigate(['/login']);
       },
       (error) => {
-        if (error.status === 400) {
-          this.errorMessage = error.error.message;
-        } else {
-          this.errorMessage = 'An error occurred during registration.';
-        }
+        console.error('Fehler bei der Registrierung:', error);
+        this.errorMessage = 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
       }
     );
   }
-
-
-
 }

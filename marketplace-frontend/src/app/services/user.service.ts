@@ -10,17 +10,23 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  register(user: { email: string; password: string; address: string }): Observable<any> {
+  register(user: { name: string; email: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, user);
   }
 
-  getUser(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/profile`);
+
+  getUserData(): Observable<{ name: string; email: string; address: string }> {
+    return this.http.get<{ name: string; email: string; address: string }>(this.apiUrl);
   }
 
-  updateUser(user: { email?: string; address?: string; password?: string }): Observable<any> {
-    return this.http.put(`${this.apiUrl}/profile`, user);
+  updateUserData(user: any): Observable<any> {
+    return this.http.put('/api/user', user);
   }
+
+  deleteAccount(): Observable<any> {
+    return this.http.delete('/api/user');
+  }
+
   login(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, { email, password });
   }
@@ -36,4 +42,5 @@ export class UserService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
 }

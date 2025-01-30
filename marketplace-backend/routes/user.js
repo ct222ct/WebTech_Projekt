@@ -10,11 +10,11 @@ const JWT_SECRET = '1234'; // Ersetze dies durch eine sicherere Option in der Pr
 
 // Registrierung
 router.post('/register', async (req, res) => {
-    const { email, password, address } = req.body;
+    const { email, password, name, address } = req.body;
 
-    // Validierung: Überprüfen, ob alle Felder ausgefüllt sind
-    if (!email || !password || !address) {
-        return res.status(400).json({ message: 'All fields are required' });
+    // Überprüfe, ob alle erforderlichen Felder vorhanden sind
+    if (!email || !password || !name || !address) {
+        return res.status(400).json({ error: 'Alle Felder (email, password, name, address) sind erforderlich.' });
     }
 
     try {
@@ -23,9 +23,19 @@ router.post('/register', async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Email address is already registered' });
         }
+        // Passwort hashen
+        const hashedPassword = await bcrypt.hash(password, 10);
+
 
         // Benutzer erstellen
-        const user = await User.create({ email, password, address });
+        const user = await User.create({
+            name,
+            address,
+            email,
+            password: hashedPassword,
+        });
+
+        await user.save();
         res.status(201).json({ message: 'User registered successfully', user: user });
     } catch (error) {
         console.error('Error during registration:', error);
@@ -35,37 +45,41 @@ router.post('/register', async (req, res) => {
 
 
 // Benutzerprofil abrufen
-router.get('/profile', authMiddleware, async (req, res) => {
+router.get('/user', async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id, { attributes: ['email', 'address'] });
+        const { userId } = req.query; // Benutzer-ID aus der Anfrage
+        const user = await User.findByPk(userId);
+
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
-        res.json(user);
+
+        res.json({ name: user.name, email: user.email, address: user.address });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerdaten', error });
     }
 });
 
 // Benutzerprofil aktualisieren
-router.put('/profile', authMiddleware, async (req, res) => {
-    const { email, address, password } = req.body;
-
+router.put('/user', async (req, res) => {
     try {
-        const user = await User.findByPk(req.user.id);
+        const { userId, name, email, address } = req.body;
+
+        const user = await User.findByPk(userId);
+
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
 
-        if (email) user.email = email;
-        if (address) user.address = address;
-        if (password) user.password = await bcrypt.hash(password, 10);
+        user.name = name || user.name;
+        user.email = email || user.email;
+        user.address = address || user.address;
 
         await user.save();
 
-        res.json({ message: 'Profile updated successfully' });
+        res.json({ message: 'Benutzerdaten erfolgreich aktualisiert', user });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Fehler beim Aktualisieren der Benutzerdaten', error });
     }
 });
 
@@ -73,32 +87,50 @@ router.put('/profile', authMiddleware, async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    console.log('Login-Anfrage erhalten:', { email, password });
-
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
+        return res.status(400).json({ error: 'E-Mail und Passwort sind erforderlich.' });
     }
 
     try {
-        // Benutzer suchen
-        const user = await User.findOne({ where: { email } });
+        // Benutzer in der Datenbank suchen
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ error: 'Ungültige Anmeldedaten.' });
         }
 
-        // Passwort prüfen
+        // Passwort validieren
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid email or password' });
+            return res.status(401).json({ error: 'Ungültige Anmeldedaten.' });
         }
 
         // JWT-Token erstellen
-        const token = jwt.sign({ id: user.id, email: user.email }, 'your_jwt_secret_key', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id, email: user.email }, '1234', {
+            expiresIn: '1h',
+        });
 
-        res.json({ message: 'Login successful', token });
+        res.json({ token });
     } catch (error) {
         console.error('Fehler beim Login:', error);
-        res.status(500).json({ message: 'An error occurred during login', error: error.message });
+        res.status(500).json({ error: 'Interner Serverfehler.' });
+    }
+});
+
+// Konto löschen
+router.delete('/user', async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+        }
+
+        await user.destroy();
+
+        res.json({ message: 'Benutzerkonto erfolgreich gelöscht' });
+    } catch (error) {
+        res.status(500).json({ message: 'Fehler beim Löschen des Benutzerkontos', error });
     }
 });
 
