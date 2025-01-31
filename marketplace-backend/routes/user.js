@@ -23,23 +23,19 @@ router.post('/register', async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Email address is already registered' });
         }
-        // Passwort hashen
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-
         // Benutzer erstellen
         const user = await User.create({
             name,
             address,
             email,
-            password: hashedPassword,
+            password,
         });
 
         await user.save();
         res.status(201).json({ message: 'User registered successfully', user: user });
     } catch (error) {
-        console.error('Error during registration:', error);
-        res.status(500).json({ message: 'Failed to register user', error: error.message });
+        console.error('Fehler bei der Registrierung:', error);
+        res.status(500).json({ message: 'Interner Serverfehler.', error: error.message });
     }
 });
 
@@ -79,6 +75,7 @@ router.put('/user', async (req, res) => {
 
         res.json({ message: 'Benutzerdaten erfolgreich aktualisiert', user });
     } catch (error) {
+        console.error('Fehler beim Login:', error);
         res.status(500).json({ message: 'Fehler beim Aktualisieren der Benutzerdaten', error });
     }
 });
@@ -87,25 +84,33 @@ router.put('/user', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    console.log('E-Mail:', email);
+    console.log('Eingegebenes Passwort:', password);
+
     if (!email || !password) {
         return res.status(400).json({ error: 'E-Mail und Passwort sind erforderlich.' });
     }
 
     try {
         // Benutzer in der Datenbank suchen
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ where: { email } });
+
         if (!user) {
-            return res.status(401).json({ error: 'Ungültige Anmeldedaten.' });
+            console.log('Benutzer nicht gefunden.');
+            return res.status(401).json({ error: 'Ungültige Anmeldedaten (E-Mail).' });
         }
 
         // Passwort validieren
         const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        console.log('Passwort gültig:', isPasswordValid);
+
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Ungültige Anmeldedaten.' });
+            return res.status(401).json({ error: 'Ungültige Anmeldedaten (Passwort).' });
         }
 
         // JWT-Token erstellen
-        const token = jwt.sign({ id: user._id, email: user.email }, '1234', {
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
             expiresIn: '1h',
         });
 
@@ -115,6 +120,7 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ error: 'Interner Serverfehler.' });
     }
 });
+
 
 // Konto löschen
 router.delete('/user', async (req, res) => {
@@ -133,6 +139,5 @@ router.delete('/user', async (req, res) => {
         res.status(500).json({ message: 'Fehler beim Löschen des Benutzerkontos', error });
     }
 });
-
 
 module.exports = router;

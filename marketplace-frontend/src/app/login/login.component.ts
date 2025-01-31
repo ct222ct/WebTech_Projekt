@@ -40,7 +40,15 @@ export class LoginComponent {
       (response) => {
         localStorage.setItem('token', response.token); // Token speichern
         alert('Login erfolgreich!');
-        this.router.navigate(['/dashboard']); // Weiterleitung zur Dashboard-Seite
+        const returnUrl = localStorage.getItem('returnUrl'); // Letzte Seite abrufen
+
+        if (returnUrl && !returnUrl.includes('/register')) {
+          this.router.navigate([returnUrl]);
+        } else {
+          this.router.navigate(['/']); // Standard: Startseite
+        }
+        localStorage.removeItem('returnUrl'); // Rücksprung-URL löschen
+        //this.router.navigate(['/dashboard']); // Weiterleitung zur Dashboard-Seite
       },
       (error) => {
         console.error('Fehler beim Login:', error);
