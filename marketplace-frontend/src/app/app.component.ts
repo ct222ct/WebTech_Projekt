@@ -23,7 +23,7 @@ export class AppComponent {
     this.isLoggedIn = this.authService.isLoggedIn();
 
     // Beobachte Änderungen des Login-Status
-    this.authService.loginStatusChanged.subscribe((status: boolean) => {
+    this.authService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
     });
   }
