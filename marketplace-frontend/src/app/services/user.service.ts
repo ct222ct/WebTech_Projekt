@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,13 +14,18 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/register`, user);
   }
 
+  // Abrufen der Benutzerdaten
+  getUserData(): Observable<any> {
+    const token = localStorage.getItem('token'); // Hol das gespeicherte JWT-Token
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
 
-  getUserData(): Observable<{ name: string; email: string; address: string }> {
-    return this.http.get<{ name: string; email: string; address: string }>(this.apiUrl);
+    return this.http.get(`${this.apiUrl}/me`, { headers });
   }
-
-  updateUserData(user: any): Observable<any> {
-    return this.http.put('/api/user', user);
+  // Aktualisieren der Benutzerdaten
+  updateUserData(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/me`, data);
   }
 
   deleteAccount(): Observable<any> {

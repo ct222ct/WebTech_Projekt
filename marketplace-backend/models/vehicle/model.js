@@ -6,5 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  Model.associate = (models) => {
+    Model.belongsTo(models.Mark, { foreignKey: 'markId' });
+    Model.belongsToMany(models.Type, {
+      through: 'ModelTypes',
+      foreignKey: 'modelId',
+    });
+  };
+
   return Model;
 };

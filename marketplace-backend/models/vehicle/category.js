@@ -6,5 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  Category.associate = (models) => {
+    Category.hasMany(models.Mark, { foreignKey: 'categoryId' });
+    Category.hasMany(models.Type, { foreignKey: 'categoryId' });
+  };
+
   return Category;
 };

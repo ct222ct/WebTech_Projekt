@@ -1,78 +1,79 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
-import { VehicleService } from '../services/vehicle.service';
+import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.less'],
   imports: [
-    FormsModule,
-    NgIf
-  ]
+    NgIf,
+    FormsModule
+  ],
+  styleUrls: ['./profile.component.less']
 })
-export class ProfileComponent {
-  user: any = {
+export class ProfileComponent implements OnInit {
+  user = {
     name: '',
     email: '',
     address: '',
+    password: '',
+    confirmPassword: ''
   };
-  vehicles: any[] = [];
-  editProfile: boolean = false;
-  editVehicleId: number | null = null;
+  errorMessage: string | null = null;
+  isEditMode: boolean = false; // Bearbeitungsmodus steuern
 
-  constructor(
-    protected userService: UserService,
-    private vehicleService: VehicleService
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
     this.loadUserData();
-    this.loadVehicles();
   }
 
   loadUserData(): void {
-    this.userService.getUserData().subscribe((data) => {
-      this.user = data;// Lade gespeicherte Benutzerdaten
-    });
+    this.userService.getUserData().subscribe(
+      (data) => {
+        this.user.name = data.name;
+        this.user.email = data.email;
+        this.user.address = data.address;
+      },
+      (error) => {
+        console.error('Fehler beim Laden der Benutzerdaten:', error);
+        this.errorMessage = 'Die Benutzerdaten konnten nicht geladen werden.';
+      }
+    );
   }
 
-  loadVehicles(): void {
-    this.vehicleService.getUserVehicles().subscribe((data) => {
-      this.vehicles = data;
-    });
-  }
-
-  toggleEditProfile(): void {
-    this.editProfile = !this.editProfile;
-  }
-
-  saveProfile(): void {
-    this.userService.updateUserData(this.user).subscribe(() => {
-      this.editProfile = false;
-      alert('Profil erfolgreich aktualisiert!');
-    });
-  }
-
-  deleteVehicle(vehicleId: number): void {
-    if (confirm('Möchten Sie diese Anzeige wirklich löschen?')) {
-      this.vehicleService.deleteVehicle(vehicleId).subscribe(() => {
-        this.vehicles = this.vehicles.filter((v) => v.id !== vehicleId);
-        alert('Anzeige wurde gelöscht.');
-      });
+  toggleEditMode(): void {
+    this.isEditMode = !this.isEditMode; // Bearbeitungsmodus umschalten
+    if (!this.isEditMode) {
+      // Wenn der Bearbeitungsmodus deaktiviert wird, lade die Originaldaten erneut
+      this.loadUserData();
     }
   }
 
-  editVehicle(vehicleId: number): void {
-    this.editVehicleId = vehicleId;
-  }
+  saveProfile(): void {
+    if (this.user.password && this.user.password !== this.user.confirmPassword) {
+      this.errorMessage = 'Die Passwörter stimmen nicht überein.';
+      return;
+    }
 
-  saveVehicle(vehicle: any): void {
-    this.vehicleService.updateVehicle(vehicle).subscribe(() => {
-      this.editVehicleId = null;
-      alert('Anzeige erfolgreich aktualisiert!');
-    });
+    const updatedData = {
+      name: this.user.name,
+      email: this.user.email,
+      address: this.user.address,
+      password: this.user.password
+    };
+
+    this.userService.updateUserData(updatedData).subscribe(
+      () => {
+        alert('Profil erfolgreich aktualisiert');
+        this.errorMessage = null;
+        this.isEditMode = false; // Bearbeitungsmodus deaktivieren
+      },
+      (error) => {
+        console.error('Fehler beim Speichern der Benutzerdaten:', error);
+        this.errorMessage = 'Das Profil konnte nicht aktualisiert werden.';
+      }
+    );
   }
 }

@@ -1,15 +1,12 @@
 const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
 
-// Verbindung zur Datenbank herstellen
-const sequelize = new Sequelize('marketplace', 'postgres', '1234', {
-    host: 'localhost',
-    dialect: 'postgres', // Ersetze dies durch den genutzten Dialekt (z. B. mysql, sqlite)
-    logging: true, // Optional: Deaktiviert SQL-Logging
+dotenv.config();
+
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'postgres',
+    logging:  console.log, // Deaktiviere SQL-Ausgaben
 });
-
-sequelize
-    .authenticate()
-    .then(() => console.log('Verbindung zur Datenbank erfolgreich hergestellt'))
-    .catch((err) => console.error('Fehler bei der Verbindung zur Datenbank:', err));
 
 module.exports = sequelize;

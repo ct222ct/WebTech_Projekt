@@ -27,16 +27,15 @@ export const routes: Routes = [
   // Registrierung
   {
     path: 'register',
-    loadComponent: () =>
-      import('./register/register.component').then((m) => m.RegisterComponent),
+    component: RegisterComponent
   },
-
+/*
   // Fahrzeug-Marktplatz
   {
     path: 'vehicles',
     loadComponent: () =>
-      import('./vehicle-marketplace/vehicle-marketplace.component').then(
-        (m) => m.VehicleMarketplaceComponent
+      import('./vehicle/vehicle.component').then(
+        (m) => m.VehicleComponent
       ),
   },
 
@@ -48,6 +47,7 @@ export const routes: Routes = [
         (m) => m.VehicleDetailComponent
       ),
   },
+ */
 
   // Benutzerprofil
   {

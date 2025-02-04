@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const authMiddleware = require('../middlewares/auth');
+const {updateUser, getUser} = require("../controllers/userController");
 
 const router = express.
 Router();
@@ -139,5 +140,12 @@ router.delete('/user', async (req, res) => {
         res.status(500).json({ message: 'Fehler beim Löschen des Benutzerkontos', error });
     }
 });
+
+// Hol die Daten des eingeloggten Benutzers
+router.get('/me', authMiddleware, getUser);
+
+// Aktualisiere die Daten des eingeloggten Benutzers
+router.put('/me', authMiddleware, updateUser);
+
 
 module.exports = router;

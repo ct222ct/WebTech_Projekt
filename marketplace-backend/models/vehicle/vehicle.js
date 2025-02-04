@@ -9,18 +9,22 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
         price: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false,
+        },
+        dateOfFirstRegistration: {
+            type: DataTypes.DATEONLY,
             allowNull: false,
         },
         mileage: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        dateOfFirstRegistration: {
-            type: DataTypes.DATE,
+        fuelType: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
-        type: {
+        color: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -30,12 +34,10 @@ module.exports = (sequelize, DataTypes) => {
         },
     });
 
-    // Beziehungen zu anderen Modellen
     Vehicle.associate = (models) => {
-        Vehicle.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
-        Vehicle.belongsTo(models.Mark, { foreignKey: 'markId', as: 'mark' });
-        Vehicle.belongsTo(models.Model, { foreignKey: 'modelId', as: 'model' });
-        Vehicle.belongsTo(models.Type, { foreignKey: 'typeId', as: 'type' });
+        Vehicle.belongsTo(models.Mark, { foreignKey: 'markId' });
+        Vehicle.belongsTo(models.Model, { foreignKey: 'modelId' });
+        Vehicle.belongsTo(models.Type, { foreignKey: 'typeId' });
     };
 
     return Vehicle;

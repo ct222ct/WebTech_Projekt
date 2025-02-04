@@ -1,9 +1,15 @@
 const express = require('express');
 const { sequelize, User } = require('./models'); // User aus models importieren
 const app = express();
+const dotenv = require('dotenv');
+// CORS-Middleware aktivieren
 const cors = require('cors');
 const userRoutes = require('./routes/user');
 
+
+// .env-Konfiguration laden
+dotenv.config();
+// CORS-Middleware aktivieren
 app.use(cors()); // CORS-Middleware aktivieren
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,6 +34,13 @@ app.post('/api/users/register', async (req, res) => {
     }
 });
 
+// Datenbank synchronisieren
+sequelize
+    .sync({ alter: true }) // Ändert die Tabellen, falls notwendig
+    .then(() => console.log('Datenbanktabellen synchronisiert'))
+    .catch((err) => console.error('Fehler beim Synchronisieren der Datenbank:', err));
+
+/*
 // Server starten
 app.listen(3000, async () => {
     try {
@@ -39,3 +52,8 @@ app.listen(3000, async () => {
         console.error('Fehler bei der Verbindung zur Datenbank:', error);
     }
 });
+
+ */
+// Server starten
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));

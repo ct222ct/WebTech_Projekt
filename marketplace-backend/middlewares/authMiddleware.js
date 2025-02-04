@@ -1,24 +1,23 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const JWT_SECRET = '1234'; // Ersetze dies durch eine sicherere Option in der Produktion
-
 const authMiddleware = async (req, res, next) => {
-    const token = req.headers['authorization'];
+    const token = req.header('Authorization')?.split(' ')[1];
+    console.log('Token:', token);
 
     if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
+        console.error('Kein Token bereitgestellt');
+        return res.status(401).json({ message: 'Zugriff verweigert, kein Token vorhanden' });
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = await User.findByPk(decoded.id);
-        if (!req.user) {
-            return res.status(401).json({ message: 'Invalid token' });
-        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = { id: decoded.id };
+        console.log('Benutzer-ID:', req.user.id); // Debugging
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'Failed to authenticate token' });
+        console.error('Ungültiges Token:', error.message);
+        res.status(403).json({ message: 'Ungültiges Token' });
     }
 };
 

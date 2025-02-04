@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,16 +10,22 @@ export class VehicleService {
 
   constructor(private http: HttpClient) {}
 
-  getUserVehicles(): Observable<any[]> {
-    return this.http.get<any[]>('/api/vehicles/user');
+  getVehicles(): Observable<any> {
+    return this.http.get(this.apiUrl);
   }
 
-  deleteVehicle(vehicleId: number): Observable<any> {
-    return this.http.delete(`/api/vehicles/${vehicleId}`);
+  addVehicle(data: any, token: string): Observable<any> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.post(this.apiUrl, data, { headers });
   }
 
-  updateVehicle(vehicle: any): Observable<any> {
-    return this.http.put(`/api/vehicles/${vehicle.id}`, vehicle);
+  updateVehicle(id: number, data: any, token: string): Observable<any> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
   }
 
+  deleteVehicle(id: number, token: string): Observable<any> {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+  }
 }
