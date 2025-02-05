@@ -5,6 +5,8 @@ import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './auth/auth.guard';
 import { CommonModule } from '@angular/common';
 import {HomeComponent} from './home/home.component';
+import {CategoriesComponent} from './categories/categories.component';
+import {CategoryDetailsComponent} from './category-details/category-details.component';
 
 export const routes: Routes = [
   // Startseite (geschützt)
@@ -29,25 +31,12 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent
   },
-/*
-  // Fahrzeug-Marktplatz
-  {
-    path: 'vehicles',
-    loadComponent: () =>
-      import('./vehicle/vehicle.component').then(
-        (m) => m.VehicleComponent
-      ),
-  },
+  //{ path: '', redirectTo: '/categories', pathMatch: 'full' },
+  //Categories
+  { path: 'categories', component: CategoriesComponent },
 
-  // Fahrzeugdetails
-  {
-    path: 'vehicle/:id',
-    loadComponent: () =>
-      import('./vehicle-marketplace/vehicle-detail.component').then(
-        (m) => m.VehicleDetailComponent
-      ),
-  },
- */
+  //Category Details
+  { path: 'categories/:id', component: CategoryDetailsComponent },
 
   // Benutzerprofil
   {

@@ -1,3 +1,4 @@
+//mark.js
 module.exports = (sequelize, DataTypes) => {
   const Mark = sequelize.define('Mark', {
     id: {
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
   // Assoziationen
   Mark.associate = (models) => {
     Mark.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
+    Mark.hasMany(models.Model, { foreignKey: 'markId', as: 'models' });
   };
 
   return Mark;

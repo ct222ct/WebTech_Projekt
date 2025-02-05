@@ -5,17 +5,24 @@ const dotenv = require('dotenv');
 // CORS-Middleware aktivieren
 const cors = require('cors');
 const userRoutes = require('./routes/user');
-
+const {json} = require("express");
+const categoryRoutes = require('./routes/categoryRoutes');
+const vehicleRoutes = require('./routes/vehicleRoutes');
 
 // .env-Konfiguration laden
 dotenv.config();
 // CORS-Middleware aktivieren
 app.use(cors()); // CORS-Middleware aktivieren
+// Middleware
+app.use(json());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 sequelize.sync({ alter: true });
 // Benutzer-Routen registrieren
 app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes); // Endpunkte für Kategorien
+app.use('/api/vehicles', vehicleRoutes);   // Endpunkte für Fahrzeuge
 
 app.post('/api/users/register', async (req, res) => {
     const { email, password, address } = req.body;
@@ -40,20 +47,6 @@ sequelize
     .then(() => console.log('Datenbanktabellen synchronisiert'))
     .catch((err) => console.error('Fehler beim Synchronisieren der Datenbank:', err));
 
-/*
-// Server starten
-app.listen(3000, async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Datenbankverbindung erfolgreich hergestellt.');
-        await sequelize.sync();
-        console.log('Datenbank synchronisiert.');
-    } catch (error) {
-        console.error('Fehler bei der Verbindung zur Datenbank:', error);
-    }
-});
-
- */
 // Server starten
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));

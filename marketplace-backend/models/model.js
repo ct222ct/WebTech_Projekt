@@ -1,3 +1,4 @@
+//model.js
 module.exports = (sequelize, DataTypes) => {
   const Model = sequelize.define('Model', {
     id: {
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
   // Assoziationen
   Model.associate = (models) => {
     Model.belongsTo(models.Mark, { foreignKey: 'markId', as: 'mark' });
+    Model.hasMany(models.Vehicle, { foreignKey: 'modelId', as: 'vehicles' });
   };
 
   return Model;

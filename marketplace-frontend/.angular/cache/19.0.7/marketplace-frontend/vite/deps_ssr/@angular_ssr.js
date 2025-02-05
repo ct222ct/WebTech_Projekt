@@ -12,9 +12,9 @@ import {
   provideServerRoutesConfig,
   setAngularAppEngineManifest,
   setAngularAppManifest
-} from "./chunk-24MNGGDE.js";
-import "./chunk-42CGL2TN.js";
+} from "./chunk-KUWTH6M7.js";
 import "./chunk-BTRX53DY.js";
+import "./chunk-42CGL2TN.js";
 import "./chunk-IC2DTLFA.js";
 import "./chunk-OFHWVIML.js";
 import "./chunk-ICOTJOGS.js";

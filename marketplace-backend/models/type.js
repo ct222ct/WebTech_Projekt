@@ -1,3 +1,4 @@
+//type.js
 module.exports = (sequelize, DataTypes) => {
   const Type = sequelize.define('Type', {
     id: {
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
   // Assoziationen
   Type.associate = (models) => {
     Type.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
+    Type.hasMany(models.Vehicle, { foreignKey: 'typeId', as: 'vehicles' });
   };
 
   return Type;

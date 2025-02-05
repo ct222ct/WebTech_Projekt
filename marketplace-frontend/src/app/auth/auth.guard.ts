@@ -14,11 +14,6 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // Speichere die letzte Seite, außer wenn es die Registrierungsseite ist
-    if (!state.url.includes('/register')) {
-      localStorage.setItem('returnUrl', state.url);
-    }
-
     this.router.navigate(['/login']);
     return false;
   }

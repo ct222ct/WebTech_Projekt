@@ -1,3 +1,4 @@
+//Vehicle.js
 module.exports = (sequelize, DataTypes) => {
     const Vehicle = sequelize.define('Vehicle', {
         id: {
@@ -25,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
     // Assoziationen
     Vehicle.associate = (models) => {
         Vehicle.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
+        Vehicle.belongsTo(models.Mark, { foreignKey: 'markId', as: 'mark' });
+        Vehicle.belongsTo(models.Model, { foreignKey: 'modelId', as: 'model' });
+        Vehicle.belongsTo(models.Type, { foreignKey: 'typeId', as: 'type' });
     };
 
     return Vehicle;
