@@ -1,39 +1,48 @@
+const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define(
-        'User', // Modellname (wichtig)
-        {
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                unique: true,
-                validate: {
-                    isEmail: true,
-                },
-            },
-            password: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            address: {
-                type: DataTypes.STRING,
-                allowNull: false,
+    const User = sequelize.define('User', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true,
             },
         },
-        {
-            hooks: {
-                beforeSave: async (user) => {
-                    if (user.changed('password')) {
-                        const bcrypt = require('bcrypt');
-                        user.password = await bcrypt.hash(user.password, 10);
-                    }
-                },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        address: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+    }, {
+        hooks: {
+            beforeSave: async (user) => {
+                if (user.changed('password')) {
+                    const salt = await bcrypt.genSalt(10);
+                    user.password = await bcrypt.hash(user.password, salt);
+                }
             },
-        }, {
-            tableName: 'Users'
-        }
-    );
+        },
+    });
+
+// Assoziationen
+    User.associate = (models) => {
+        console.log('Initialisiere Assoziation für User mit Vehicle'); // Debugging
+        User.hasMany(models.Vehicle, { foreignKey: 'userId', as: 'vehicles' });
+    };
+
+    return User;
 };

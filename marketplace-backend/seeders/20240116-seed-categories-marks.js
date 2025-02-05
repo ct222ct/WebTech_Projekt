@@ -1,23 +1,18 @@
-const { Category, Mark, Model, Type } = require('../models');
+module.exports = {
+    up: async (queryInterface, Sequelize) => {
+        const categories = await queryInterface.sequelize.query(
+            'SELECT id FROM "Categories";'
+        );
 
-(async () => {
-    // Categories
-    const cars = await Category.create({ name: 'Cars' });
-    const motorbikes = await Category.create({ name: 'Motorbikes' });
+        const categoryId = categories[0][0].id;
 
-    // Marks
-    const audi = await Mark.create({ name: 'Audi', categoryId: cars.id });
-    const harley = await Mark.create({ name: 'Harley-Davidson', categoryId: motorbikes.id });
+        await queryInterface.bulkInsert('Marks', [
+            { name: 'Audi', categoryId, createdAt: new Date(), updatedAt: new Date() },
+            { name: 'BMW', categoryId, createdAt: new Date(), updatedAt: new Date() },
+        ]);
+    },
 
-    // Models
-    const aClass = await Model.create({ name: 'A-Class', markId: audi.id });
-    const cClass = await Model.create({ name: 'C-Class', markId: audi.id });
-
-    // Types
-    const limousine = await Type.create({ name: 'Limousine', categoryId: cars.id });
-    const sportsCar = await Type.create({ name: 'Sports Car', categoryId: cars.id });
-
-    // Associate Models and Types
-    await aClass.addType(limousine);
-    await cClass.addType(sportsCar);
-})();
+    down: async (queryInterface, Sequelize) => {
+        await queryInterface.bulkDelete('Marks', null, {});
+    },
+};
