@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
 
     // Assoziation zu Type mit einem eindeutigen Alias
     Category.hasMany(models.Type, { foreignKey: 'categoryId', as: 'categoryTypes' });
+
+    // Assoziation zu Vehicle mit einem eindeutigen Alias
+    Category.hasMany(models.Vehicle, { foreignKey: 'categoryId', as: 'vehicles' });
   };
 
   return Category;

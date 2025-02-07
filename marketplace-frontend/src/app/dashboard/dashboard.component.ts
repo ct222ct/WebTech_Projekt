@@ -1,22 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.less'],
+  imports: [
+    NgForOf,
+    NgIf
+  ]
 })
-export class DashboardComponent {
-  constructor(private authService: AuthService, private router: Router) {}
-/*
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+export class DashboardComponent implements OnInit {
+  categories = [
+    { name: 'Autos', route: 'cars', imageUrl: 'assets/images/cars.png' },
+    { name: 'Motorräder', route: 'motorbikes', imageUrl: 'assets/images/motorbikes.png' },
+  ];
+
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {}
+
+  viewVehicles(category: { route: string }): void {
+    this.router.navigate([`/vehicles/${category.route}`]);
   }
- */
 }

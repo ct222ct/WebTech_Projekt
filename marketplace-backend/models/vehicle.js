@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        price: {
+            type: DataTypes.FLOAT,
+        },
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -29,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         Vehicle.belongsTo(models.Mark, { foreignKey: 'markId', as: 'mark' });
         Vehicle.belongsTo(models.Model, { foreignKey: 'modelId', as: 'model' });
         Vehicle.belongsTo(models.Type, { foreignKey: 'typeId', as: 'type' });
+        Vehicle.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
     };
 
     return Vehicle;

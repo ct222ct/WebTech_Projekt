@@ -1,11 +1,9 @@
-//index.js
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const sequelize = require('../config/database'); // Importiere die DB-Instanz
 const db = {};
-const Category = require('./category');
 
 fs.readdirSync(__dirname)
     .filter((file) => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js')
@@ -14,7 +12,6 @@ fs.readdirSync(__dirname)
         const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
         db[model.name] = model;
     });
-
 
 // Initialisiere Assoziationen
 Object.keys(db).forEach((modelName) => {
@@ -30,14 +27,19 @@ db.Sequelize = Sequelize;
 // Kategorien automatisch hinzufügen
 (async () => {
     try {
-        await sequelize.sync({ alter: true }); // Tabellenstruktur anpassen
-        console.log('Datenbank wurde erfolgreich synchronisiert.');
+        await sequelize.authenticate();
+        console.log('Datenbankverbindung hergestellt.');
+
+        // Synchronisation der Tabellen
+        await sequelize.sync({ force: false, alter: true });// Tabellenstruktur aktualisieren, ohne Daten zu löschen
+        console.log('Tabellen erfolgreich synchronisiert.');
+
+        // Zusätzliche Initialisierungen
         const Category = db.Category;
         const Mark = db.Mark;
         const Model = db.Model;
 
-
-        // Überprüfen und hinzufügen
+        // Kategorien hinzufügen
         const categories = ['Cars', 'Motorbikes'];
         for (const categoryName of categories) {
             const [category] = await Category.findOrCreate({
@@ -46,60 +48,28 @@ db.Sequelize = Sequelize;
             });
             console.log(`Kategorie hinzugefügt oder existiert bereits: ${categoryName}`);
 
-            // Marken für Autos
+            // Beispiel-Markierungen und Modelle hinzufügen
             if (categoryName === 'Cars') {
-                const carMarks = ['Audi', 'Mercedes-Benz', 'BMW'];
-                for (const markName of carMarks) {
+                const marks = ['Audi', 'BMW', 'Mercedes-Benz'];
+                for (const markName of marks) {
                     const [mark] = await Mark.findOrCreate({
                         where: { name: markName, categoryId: category.id },
                         defaults: { name: markName, categoryId: category.id },
                     });
-
                     console.log(`Marke hinzugefügt oder existiert bereits: ${markName}`);
 
-                    // Modelle für jede Marke
                     const models = {
-                        'Audi': ['A3', 'A4', 'Q5'],
-                        'Mercedes-Benz': ['A-Class', 'C-Class', 'E-Class'],
-                        'BMW': ['X1', 'X3', 'X5'],
+                        Audi: ['A3', 'A4', 'Q5'],
+                        BMW: ['X1', 'X3', 'X5'],
+                        'Mercedes-Benz': ['C-Class', 'E-Class'],
                     };
+
                     if (models[markName]) {
                         for (const modelName of models[markName]) {
                             await Model.findOrCreate({
                                 where: { name: modelName, markId: mark.id },
                                 defaults: { name: modelName, markId: mark.id },
                             });
-
-                            console.log(`Modell hinzugefügt oder existiert bereits: ${modelName}`);
-                        }
-                    }
-                }
-            }
-
-            // Marken für Motorräder
-            if (categoryName === 'Motorbikes') {
-                const bikeMarks = ['Harley-Davidson', 'Yamaha', 'Kawasaki'];
-                for (const markName of bikeMarks) {
-                    const [mark] = await Mark.findOrCreate({
-                        where: {name: markName, categoryId: category.id},
-                        defaults: {name: markName, categoryId: category.id},
-                    });
-
-                    console.log(`Marke hinzugefügt oder existiert bereits: ${markName}`);
-
-                    // Modelle für jede Marke
-                    const models = {
-                        'Harley-Davidson': ['Street 750', 'Iron 883'],
-                        'Yamaha': ['YZF-R3', 'MT-07'],
-                        'Kawasaki': ['Ninja 300', 'Z650'],
-                    };
-                    if (models[markName]) {
-                        for (const modelName of models[markName]) {
-                            await Model.findOrCreate({
-                                where: {name: modelName, markId: mark.id},
-                                defaults: {name: modelName, markId: mark.id},
-                            });
-
                             console.log(`Modell hinzugefügt oder existiert bereits: ${modelName}`);
                         }
                     }
@@ -107,7 +77,7 @@ db.Sequelize = Sequelize;
             }
         }
     } catch (error) {
-        console.error('Fehler beim Hinzufügen der Kategorien:', error);
+        console.error('Fehler beim Initialisieren der Datenbank:', error);
     }
 })();
 

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CategoryService } from '../services/category.service';
 import {NgForOf} from '@angular/common';
 
@@ -13,7 +14,7 @@ import {NgForOf} from '@angular/common';
 export class CategoriesComponent implements OnInit {
   categories: any[] = [];
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(private categoryService: CategoryService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadCategories();
@@ -25,8 +26,11 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  viewCategoryDetails(category: any): void {
-    // Weiterleitung zur Detailseite
-    console.log('Kategorie gewählt:', category);
+  viewVehicles(category: any): void {
+    if (category.name === 'Cars') {
+      this.router.navigate(['/vehicles/cars']);
+    } else if (category.name === 'Motorbikes') {
+      this.router.navigate(['/vehicles/motorbikes']);
+    }
   }
 }

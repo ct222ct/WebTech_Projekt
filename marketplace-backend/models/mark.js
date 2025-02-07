@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   Mark.associate = (models) => {
     Mark.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
     Mark.hasMany(models.Model, { foreignKey: 'markId', as: 'models' });
+    Mark.hasMany(models.Vehicle, { foreignKey: 'markId', as: 'vehicles' });
   };
 
   return Mark;

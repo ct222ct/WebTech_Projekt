@@ -28,4 +28,8 @@ export class VehicleService {
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
     return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
+  getVehiclesByType(typeId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/types/${typeId}`);
+  }
+
 }

@@ -1,0 +1,13 @@
+<div class="container">
+  <h2>Motorräder</h2>
+  <div class="row">
+    <div *ngFor="let bike of bikes" class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ bike.mark }} {{ bike.model }}</h5>
+          <p class="card-text">Typ: {{ bike.type }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

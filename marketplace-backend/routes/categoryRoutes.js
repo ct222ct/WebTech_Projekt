@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Category, Type, Mark } = require('../models');
+const categoryController = require('../controllers/categoryController');
 
 // Alle Kategorien abrufen
 router.get('/', async (req, res) => {
@@ -31,5 +32,8 @@ router.get('/:id/marks', async (req, res) => {
         res.status(500).json({ message: 'Fehler beim Abrufen der Marken', error });
     }
 });
+
+// Route: Kategorie mit Details abrufen
+router.get('/:id', categoryController.getCategoryDetails);
 
 module.exports = router;

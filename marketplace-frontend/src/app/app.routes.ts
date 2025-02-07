@@ -7,6 +7,9 @@ import { CommonModule } from '@angular/common';
 import {HomeComponent} from './home/home.component';
 import {CategoriesComponent} from './categories/categories.component';
 import {CategoryDetailsComponent} from './category-details/category-details.component';
+import {CarsComponent} from './vehicles/cars/cars.component';
+import {MotorbikesComponent} from './vehicles/motorbikes/motorbikes.component';
+import {VehicleListComponent} from './vehicle-list/vehicle-list.component';
 
 export const routes: Routes = [
   // Startseite (geschützt)
@@ -37,6 +40,12 @@ export const routes: Routes = [
 
   //Category Details
   { path: 'categories/:id', component: CategoryDetailsComponent },
+
+  { path: 'vehicles/cars', component: CarsComponent },
+
+  { path: 'vehicles/motorbikes', component: MotorbikesComponent },
+
+  { path: 'vehicles/:category', component: VehicleListComponent },
 
   // Benutzerprofil
   {

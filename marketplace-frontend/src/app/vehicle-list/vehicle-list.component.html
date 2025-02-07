@@ -1,0 +1,19 @@
+<div class="vehicle-list-container">
+  <h2>{{ category }}</h2>
+
+  <div *ngIf="isLoading" class="loading">
+    Daten werden geladen...
+  </div>
+
+  <div *ngIf="!isLoading && vehicles.length === 0" class="no-data">
+    Keine Fahrzeuge gefunden.
+  </div>
+
+  <div *ngIf="!isLoading && vehicles.length > 0" class="vehicles">
+    <div class="vehicle" *ngFor="let vehicle of vehicles">
+      <h3>{{ vehicle.name }}</h3>
+      <p>{{ vehicle.description }}</p>
+      <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+    </div>
+  </div>
+</div>

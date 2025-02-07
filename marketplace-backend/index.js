@@ -40,13 +40,26 @@ app.post('/api/users/register', async (req, res) => {
         res.status(500).json({ message: 'Fehler beim Speichern der Registrierung.' });
     }
 });
+app.get('/api/categories/:categoryId/marks', async (req, res) => {
+    const categoryId = req.params.categoryId;
+    const marks = await Mark.findAll({ where: { categoryId } });
+    res.json(marks);
+});
+
+
+app.use(express.json());
+app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
+app.use('/api/vehicles', vehicleRoutes); // Endpunkt für Fahrzeuge registrieren
 
 // Datenbank synchronisieren
-sequelize
-    .sync({ alter: true }) // Ändert die Tabellen, falls notwendig
-    .then(() => console.log('Datenbanktabellen synchronisiert'))
-    .catch((err) => console.error('Fehler beim Synchronisieren der Datenbank:', err));
-
+(async () => {
+    try {
+        await sequelize.sync({ alter: true }); // Strukturelle Änderungen anwenden, ohne Constraints zu entfernen
+        console.log('Database synchronized successfully!');
+    } catch (error) {
+        console.error('Error during database synchronization:', error);
+    }
+})();
 // Server starten
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
