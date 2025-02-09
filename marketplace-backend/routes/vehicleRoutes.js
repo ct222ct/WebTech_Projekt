@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Vehicle, Model, Type, Mark } = require('../models');
-const {getVehiclesByCategory} = require("../controllers/vehicleController");
+const {getVehiclesByType} = require("../controllers/vehicleController");
 
 // Endpunkt: Alle Fahrzeuge einer Kategorie abrufen
 router.get('/:category', async (req, res) => {
@@ -51,7 +51,7 @@ router.get('/types/:id', async (req, res) => {
 });
 
 // Route zum Abrufen von Fahrzeugen nach Kategorie
-router.get('/', getVehiclesByCategory);
+router.get('/', getVehiclesByType);
 
 
 module.exports = router;

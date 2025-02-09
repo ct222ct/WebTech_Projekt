@@ -47,7 +47,6 @@ app.get('/api/categories/:categoryId/marks', async (req, res) => {
 });
 
 
-app.use(express.json());
 app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
 app.use('/api/vehicles', vehicleRoutes); // Endpunkt für Fahrzeuge registrieren
 

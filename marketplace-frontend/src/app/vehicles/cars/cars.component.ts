@@ -35,4 +35,9 @@ export class CarsComponent implements OnInit {
       },
     });
   }
+  viewDetails(vehicle: any): void {
+    console.log('Details für Fahrzeug:', vehicle);
+    // Hier können Sie Routing oder Modalfunktionalitäten implementieren
+  }
+
 }

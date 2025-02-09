@@ -10,10 +10,11 @@
   </div>
 
   <div *ngIf="!isLoading && vehicles.length > 0" class="vehicles">
-    <div *ngFor="let vehicle of vehicles" class="vehicle">
+    <div *ngFor="let vehicle of vehicles" class="vehicle-card">
       <h3>{{ vehicle.name }}</h3>
       <p>{{ vehicle.description }}</p>
       <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+      <button (click)="viewDetails(vehicle)">Details anzeigen</button>
     </div>
   </div>
 </div>
