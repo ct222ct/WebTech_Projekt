@@ -20,26 +20,24 @@ export class VehicleListComponent implements OnInit {
   constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
-    // Kategorie aus den Routen-Parametern abrufen
+    console.log('Komponente initialisiert');
     this.route.params.subscribe((params) => {
-      this.category = params['category'];
-      this.fetchVehicles();
+      console.log('API wird aufgerufen mit Kategorie:', params['category']);
+      this.fetchVehicles(params['category']);
     });
   }
 
-  fetchVehicles(): void {
-    // API-Aufruf zum Abrufen der Fahrzeugdaten
-    this.http
-      .get<any[]>(`http://localhost:3000/api/vehicles/${this.category}`)
-      .subscribe({
-        next: (data) => {
-          this.vehicles = data;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Fehler beim Abrufen der Fahrzeugdaten:', error);
-          this.isLoading = false;
-        },
-      });
+  fetchVehicles(category: string): void {
+    this.http.get<any[]>(`http://localhost:3000/api/vehicles/${category}`).subscribe({
+      next: (data) => {
+        console.log('Erhaltene API-Daten:', data);
+        this.vehicles = data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Fehler beim Abrufen der Fahrzeugdaten:', error);
+        this.isLoading = false;
+      },
+    });
   }
 }

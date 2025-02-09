@@ -1,27 +1,22 @@
-const { Vehicle } = require('../models'); // Importiere nur das benötigte Modell
+const { Vehicle } = require('../models'); // Importieren des Modells
 
-const getVehiclesByCategory = async (req, res) => {
+const getVehiclesByType = async (req, res) => {
     try {
-        console.log("API wurde aufgerufen mit Query:", req.query); // Debugging
-        const { categoryId } = req.query;
+        const { typeId } = req.params; // typeId aus der Anfrage
+        console.log('Angeforderte typeId:', typeId);
 
-        // Validierung der Anfrage
-        if (!categoryId) {
-            console.error("Kategorie-ID fehlt in der Anfrage.");
-            return res.status(400).json({ message: "Kategorie-ID ist erforderlich" });
+        const vehicles = await Vehicle.findAll({ where: { typeId } }); // Abfrage der Daten
+        console.log('Gefundene Fahrzeuge:', vehicles);
+
+        if (vehicles.length === 0) {
+            return res.status(404).json({ message: 'Keine Fahrzeuge gefunden.' });
         }
 
-        // Abrufen der Fahrzeuge für die Kategorie
-        const vehicles = await Vehicle.findAll({
-            where: { categoryId }, // Überprüft nur die Kategorie-ID
-        });
-
-        console.log("Gefundene Fahrzeuge:", vehicles); // Debugging
-        return res.json(vehicles);
+        res.json(vehicles);
     } catch (error) {
-        console.error("Fehler beim Abrufen der Fahrzeuge:", error); // Debugging
-        return res.status(500).json({ message: "Interner Serverfehler" });
+        console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+        res.status(500).json({ message: 'Interner Serverfehler' });
     }
 };
 
-module.exports = { getVehiclesByCategory };
+module.exports = { getVehiclesByType };
