@@ -10,6 +10,8 @@ import {CategoryDetailsComponent} from './category-details/category-details.comp
 import {CarsComponent} from './vehicles/cars/cars.component';
 import {MotorbikesComponent} from './vehicles/motorbikes/motorbikes.component';
 import {VehicleListComponent} from './vehicle-list/vehicle-list.component';
+import {SellerComponent} from './seller/seller.component';
+import {SellerListingsComponent} from './seller-listings/seller-listings.component';
 
 export const routes: Routes = [
   // Startseite (geschützt)
@@ -61,10 +63,14 @@ export const routes: Routes = [
       import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
     canActivate: [AuthGuard], // Nur für authentifizierte Benutzer zugänglich
   },
+  { path: 'seller', component: SellerComponent },
 
+  { path: 'seller/listings', component: SellerListingsComponent , canActivate: [AuthGuard]},
 
   // Standardroute für unbekannte Pfade
   { path: '**', redirectTo: '', pathMatch: 'full' },
+
+
 ];
 
 @NgModule({

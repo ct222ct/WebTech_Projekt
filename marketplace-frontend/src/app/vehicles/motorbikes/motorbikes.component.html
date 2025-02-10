@@ -1,13 +1,20 @@
-<div class="container">
+<div class="vehicle-list-container">
   <h2>Motorräder</h2>
-  <div class="row">
-    <div *ngFor="let bike of bikes" class="col-md-4">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{{ bike.mark }} {{ bike.model }}</h5>
-          <p class="card-text">Typ: {{ bike.type }}</p>
-        </div>
-      </div>
+
+  <div *ngIf="isLoading" class="loading">
+    Daten werden geladen...
+  </div>
+
+  <div *ngIf="!isLoading && vehicles.length === 0" class="no-data">
+    Keine Fahrzeuge gefunden.
+  </div>
+
+  <div *ngIf="!isLoading && vehicles.length > 0" class="vehicles">
+    <div *ngFor="let vehicle of vehicles" class="vehicle-card">
+      <h3>{{ vehicle.name }}</h3>
+      <p>{{ vehicle.description }}</p>
+      <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+      <button (click)="viewDetails(vehicle)">Details anzeigen</button>
     </div>
   </div>
 </div>

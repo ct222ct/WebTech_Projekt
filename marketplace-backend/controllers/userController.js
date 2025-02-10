@@ -1,4 +1,5 @@
-const User = require('../models');
+const { User } = require('../models');
+
 const bcrypt = require('bcrypt');
 
 // Hol die Daten des eingeloggten Benutzers

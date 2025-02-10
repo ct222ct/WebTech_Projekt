@@ -1,19 +1,37 @@
 <div class="vehicle-list-container">
-  <h2>Autos</h2>
+  <h2>Fahrzeuge</h2>
 
   <div *ngIf="isLoading" class="loading">
     Daten werden geladen...
   </div>
 
-  <div *ngIf="!isLoading && vehicles.length === 0" class="no-data">
+  <div *ngIf="!isLoading && cars.length === 0 && motorbikes.length === 0" class="no-data">
     Keine Fahrzeuge gefunden.
   </div>
 
-  <div *ngIf="!isLoading && vehicles.length > 0" class="vehicles">
-    <div *ngFor="let vehicle of vehicles" class="vehicle">
-      <h3>{{ vehicle.name }}</h3>
-      <p>{{ vehicle.description }}</p>
-      <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+  <!-- Autos -->
+  <div *ngIf="!isLoading && cars.length > 0" class="vehicles-category">
+    <h3>Autos</h3>
+    <div class="vehicles">
+      <div *ngFor="let car of cars" class="vehicle-card">
+        <h4>{{ car.name }}</h4>
+        <p>{{ car.description }}</p>
+        <p><strong>Preis:</strong> {{ car.price }} €</p>
+        <button (click)="viewDetails(car)">Details anzeigen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motorräder -->
+  <div *ngIf="!isLoading && motorbikes.length > 0" class="vehicles-category">
+    <h3>Motorräder</h3>
+    <div class="vehicles">
+      <div *ngFor="let motorbike of motorbikes" class="vehicle-card">
+        <h4>{{ motorbike.name }}</h4>
+        <p>{{ motorbike.description }}</p>
+        <p><strong>Preis:</strong> {{ motorbike.price }} €</p>
+        <button (click)="viewDetails(motorbike)">Details anzeigen</button>
+      </div>
     </div>
   </div>
 </div>

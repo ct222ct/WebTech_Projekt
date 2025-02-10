@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { Vehicle, Model, Type, Mark } = require('../models');
-const {getVehiclesByType} = require("../controllers/vehicleController");
+const { Vehicle, Model, Type, Mark, Category } = require('../models'); // Ensure Category is imported
+const { getVehiclesByType, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
+const { getSellerListings , markAsSold} = require('../controllers/vehicleController');
+const upload = require('../middlewares/multer');
+const authMiddleware = require('../middlewares/auth');
+
 
 // Endpunkt: Alle Fahrzeuge einer Kategorie abrufen
 router.get('/:category', async (req, res) => {
@@ -49,9 +53,20 @@ router.get('/types/:id', async (req, res) => {
     res.status(500).json({ message: 'Fehler beim Abrufen der Fahrzeuge', error });
   }
 });
-
-// Route zum Abrufen von Fahrzeugen nach Kategorie
+// Route to handle vehicles by type
 router.get('/', getVehiclesByType);
 
+// Route to get seller's vehicle listings
+router.get('/seller/listings', authMiddleware, getSellerListings);
+
+// Routes to add, update, and delete vehicles with pictures
+router.post('/', upload.array('pictures'), addVehicle);
+router.put('/:id', upload.array('pictures'), updateVehicle);
+router.delete('/:id', deleteVehicle);
+
+
+
+// Route to mark a vehicle as sold
+router.put('/:id/sold', authMiddleware, markAsSold);
 
 module.exports = router;

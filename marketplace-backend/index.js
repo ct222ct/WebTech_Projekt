@@ -8,7 +8,19 @@ const userRoutes = require('./routes/user');
 const {json} = require("express");
 const categoryRoutes = require('./routes/categoryRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
+const multer = require('multer');
+const path = require('path');
 
+// Configure multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
+const upload = multer({ storage });
 // .env-Konfiguration laden
 dotenv.config();
 // CORS-Middleware aktivieren
@@ -50,10 +62,13 @@ app.get('/api/categories/:categoryId/marks', async (req, res) => {
 app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
 app.use('/api/vehicles', vehicleRoutes); // Endpunkt für Fahrzeuge registrieren
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Datenbank synchronisieren
 (async () => {
     try {
-        await sequelize.sync({ alter: true }); // Strukturelle Änderungen anwenden, ohne Constraints zu entfernen
+        await sequelize.sync({ alter: false }); // Strukturelle Änderungen anwenden, ohne Constraints zu entfernen
         console.log('Database synchronized successfully!');
     } catch (error) {
         console.error('Error during database synchronization:', error);

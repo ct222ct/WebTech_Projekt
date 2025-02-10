@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import {NgForOf, NgIf} from '@angular/common';
+import { NgForOf, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -9,35 +8,51 @@ import {NgForOf, NgIf} from '@angular/common';
   styleUrls: ['./vehicle-list.component.less'],
   imports: [
     NgIf,
-    NgForOf
+    NgForOf,
   ]
 })
 export class VehicleListComponent implements OnInit {
-  category: string = '';
-  vehicles: any[] = [];
+  cars: any[] = [];
+  motorbikes: any[] = [];
   isLoading: boolean = true;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    console.log('Komponente initialisiert');
-    this.route.params.subscribe((params) => {
-      console.log('API wird aufgerufen mit Kategorie:', params['category']);
-      this.fetchVehicles(params['category']);
-    });
+    console.log('Fahrzeugliste wird geladen');
+    this.fetchVehicles();
   }
 
-  fetchVehicles(category: string): void {
-    this.http.get<any[]>(`http://localhost:3000/api/vehicles/${category}`).subscribe({
+  fetchVehicles(): void {
+    // Autos abrufen
+    this.http.get<any[]>('http://localhost:3000/api/vehicles/types/1').subscribe({
       next: (data) => {
-        console.log('Erhaltene API-Daten:', data);
-        this.vehicles = data;
+        console.log('Autos:', data);
+        this.cars = data;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Fehler beim Abrufen der Fahrzeugdaten:', error);
+        console.error('Fehler beim Abrufen der Autos:', error);
         this.isLoading = false;
       },
     });
+
+    // Motorräder abrufen
+    this.http.get<any[]>('http://localhost:3000/api/vehicles/types/2').subscribe({
+      next: (data) => {
+        console.log('Motorräder:', data);
+        this.motorbikes = data;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Fehler beim Abrufen der Motorräder:', error);
+        this.isLoading = false;
+      },
+    });
+  }
+
+  viewDetails(vehicle: any): void {
+    console.log('Details für Fahrzeug:', vehicle);
+    // Hier können Sie weitere Logik wie Routing oder Modals implementieren
   }
 }
