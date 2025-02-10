@@ -60,17 +60,19 @@ export class SellerListingsComponent implements OnInit {
 
 
 
-markAsSold(vehicleId: number): void {
+  markAsSold(vehicleId: number): void {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-    this.http.put(`http://localhost:3000/api/vehicles/${vehicleId}/mark-as-sold`, {}).subscribe({
-      next: (response) => {
-        console.log('Vehicle marked as sold:', response);
-        this.fetchSellerListings(); // Reload listings
-      },
-      error: (error) => {
-        console.error('Error marking vehicle as sold:', error);
-      },
-    });
+    this.http.put(`http://localhost:3000/api/vehicles/mark-sold/${vehicleId}`, {}, { headers })
+      .subscribe({
+        next: () => {
+          console.log(`Vehicle ${vehicleId} marked as sold`);
+          this.loadUserAndListings(); // Refresh list
+        },
+        error: (err) => console.error('Error marking vehicle as sold:', err),
+      });
   }
+
 
 }

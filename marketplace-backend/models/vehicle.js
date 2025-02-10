@@ -43,11 +43,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.ENUM('new', 'used', 'broken'),
             allowNull: true,
         },
-        status: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            defaultValue: 'available', // Default status is "available"
-        },
+        sold: { type: DataTypes.BOOLEAN, defaultValue: false },
     }, {
         timestamps: true,
     });

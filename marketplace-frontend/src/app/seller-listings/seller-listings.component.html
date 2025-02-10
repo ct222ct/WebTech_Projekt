@@ -11,13 +11,15 @@
   </div>
 
   <div *ngIf="!isLoading && vehicles.length > 0" class="listings">
-    <div *ngFor="let listing of vehicles" class="listing-card">
-      <h3>{{ listing.name }}</h3>
-      <p>{{ listing.description }}</p>
-      <p><strong>Preis:</strong> {{ listing.price }} €</p>
-      <p><strong>Status:</strong> {{ listing.status }}</p>
+    <div *ngFor="let vehicles of vehicles" class="listing-card">
+      <h3>{{ vehicles.name }}</h3>
+      <p>{{ vehicles.description }}</p>
+      <p><strong>Preis:</strong> {{ vehicles.price }} €</p>
+      <p *ngIf="vehicles.sold" class="sold-badge"> Sold</p>
+      <button *ngIf="!vehicles.sold" (click)="markAsSold(vehicles.id)">Mark as Sold</button>
       <div class="pictures">
-        <img *ngFor="let picture of listing.pictures" [src]="picture.url" alt="Vehicle Picture" />
+        <img *ngFor="let picture of vehicles.pictures" [src]="picture.url" alt="Vehicle Picture" />
+
       </div>
     </div>
   </div>

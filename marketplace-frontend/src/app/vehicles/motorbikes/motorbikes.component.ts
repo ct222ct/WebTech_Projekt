@@ -25,8 +25,12 @@ export class MotorbikesComponent implements OnInit {
   loadMotorbikes(): void {
     this.http.get<any[]>('http://localhost:3000/api/vehicles/types/2').subscribe({
       next: (data) => {
-        console.log('API-Daten:', data);
-        this.vehicles = data;
+        console.log('API-Daten (vorher):', data);
+
+        // Filter out vehicles that are marked as sold
+        this.vehicles = data.filter(vehicle => !vehicle.sold);
+
+        console.log('API-Daten (gefiltert):', this.vehicles);
         this.isLoading = false;
       },
       error: (error) => {

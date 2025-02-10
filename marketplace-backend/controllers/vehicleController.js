@@ -1,11 +1,19 @@
 const { Vehicle } = require('../models'); // Importieren des Modells
 const { VehiclePicture } = require('../models'); // Importieren des Modells
+
+
 const getVehiclesByType = async (req, res) => {
     try {
         const { typeId } = req.params; // typeId aus der Anfrage
-        console.log('Angeforderte typeId:', typeId);
+        const { sold } = req.query; // sold aus der Anfrage
 
-        const vehicles = await Vehicle.findAll({ where: { typeId } }); // Abfrage der Daten
+        const vehicles = await Vehicle.findAll({
+            where: {
+                typeId: typeId,
+                sold: false, // Exclude sold vehicles
+            },
+        });
+
         console.log('Gefundene Fahrzeuge:', vehicles);
 
         if (vehicles.length === 0) {
@@ -146,25 +154,28 @@ const getSellerListings = async (req, res) => {
 
 const markAsSold = async (req, res) => {
     try {
-        const { id } = req.params; // Extract vehicle ID from the URL
+        const { vehicleId } = req.params;
+        const vehicle = await Vehicle.findByPk(vehicleId);
 
-        // Find the vehicle by ID
-        const vehicle = await Vehicle.findByPk(id);
         if (!vehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
+            return res.status(404).json({ message: 'Vehicle not found' });
         }
 
-        // Update the vehicle's status to 'sold'
-        vehicle.status = 'sold';
+        // Ensure only the owner can mark it as sold
+        if (vehicle.userId !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        vehicle.sold = true;
         await vehicle.save();
 
-        res.json(vehicle); // Respond with the updated vehicle
+        console.log(`Vehicle ${vehicleId} marked as sold `); // Debugging
+        res.json({ message: 'Vehicle marked as sold', vehicle });
     } catch (error) {
         console.error('Error marking vehicle as sold:', error);
-        res.status(500).json({ error: 'Error marking vehicle as sold' });
+        res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 
 

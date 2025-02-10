@@ -54,7 +54,7 @@ router.get('/types/:id', async (req, res) => {
   }
 });
 // Route to handle vehicles by type
-router.get('/', getVehiclesByType);
+router.get('/', getVehiclesByType, authMiddleware, markAsSold);
 
 // Route to get seller's vehicle listings
 router.get('/seller/listings', authMiddleware, getSellerListings);
@@ -67,6 +67,7 @@ router.delete('/:id', deleteVehicle);
 
 
 // Route to mark a vehicle as sold
-router.put('/:id/sold', authMiddleware, markAsSold);
+router.put('/mark-sold/:vehicleId', authMiddleware, markAsSold);
+
 
 module.exports = router;
