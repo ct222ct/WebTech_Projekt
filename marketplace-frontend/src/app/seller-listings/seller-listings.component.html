@@ -3,18 +3,18 @@
   <p *ngIf="user">Welcome, {{ user.name }}</p>
 
   <div *ngIf="isLoading" class="loading">
-    Loading your listings...
+    Daten werden geladen...
   </div>
 
-  <div *ngIf="!isLoading && listings.length === 0" class="no-data">
+  <div *ngIf="!isLoading && vehicles.length === 0" class="no-data">
     You have no listings.
   </div>
 
-  <div *ngIf="!isLoading && listings.length > 0" class="listings">
-    <div *ngFor="let listing of listings" class="listing-card">
+  <div *ngIf="!isLoading && vehicles.length > 0" class="listings">
+    <div *ngFor="let listing of vehicles" class="listing-card">
       <h3>{{ listing.name }}</h3>
       <p>{{ listing.description }}</p>
-      <p><strong>Price:</strong> {{ listing.price }} €</p>
+      <p><strong>Preis:</strong> {{ listing.price }} €</p>
       <p><strong>Status:</strong> {{ listing.status }}</p>
       <div class="pictures">
         <img *ngFor="let picture of listing.pictures" [src]="picture.url" alt="Vehicle Picture" />

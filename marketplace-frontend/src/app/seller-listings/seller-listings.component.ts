@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { UserService } from '../services/user.service';
 import {NgForOf, NgIf} from '@angular/common'; // Import UserService
 
@@ -16,38 +16,45 @@ export class SellerListingsComponent implements OnInit {
   listings: any[] = [];
   isLoading: boolean = true;
   user: any = null;
+  vehicles: any[] = [];
 
   constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit(): void {
     this.loadUserAndListings();
+
   }
 
   loadUserAndListings(): void {
     this.userService.getUserData().subscribe({
       next: (user) => {
-        this.user = user;
-        console.log('User loaded:', user);
-        this.fetchSellerListings(user.id); // Pass the user ID to fetch listings
+        console.log('Benutzer erfolgreich geladen:', user);
+        this.fetchSellerListings();
       },
-      error: (error) => {
-        console.error('Error loading user data:', error);
+      error: (err) => {
+        console.error('Fehler beim Abrufen der Benutzerdaten:', err);
         this.isLoading = false;
-      },
+      }
     });
   }
 
-  fetchSellerListings(userId: number): void {
-    this.http.get<any[]>(`http://localhost:3000/api/vehicles/seller/listings?userId=${userId}`).subscribe({
+  fetchSellerListings(): void {
+    const token = localStorage.getItem('token'); // Token abrufen
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http.get<any[]>('http://localhost:3000/api/vehicles/seller/listings', { headers }).subscribe({
       next: (data) => {
-        console.log('Seller Listings:', data);
-        this.listings = data;
+        console.log('Empfangene Fahrzeugdaten:', data);
+        this.vehicles = data;
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error fetching seller listings:', error);
+      error: (err) => {
+        console.error('Fehler beim Abrufen der Fahrzeuglisten:', err);
         this.isLoading = false;
-      },
+      }
     });
   }
 
@@ -58,7 +65,7 @@ markAsSold(vehicleId: number): void {
     this.http.put(`http://localhost:3000/api/vehicles/${vehicleId}/mark-as-sold`, {}).subscribe({
       next: (response) => {
         console.log('Vehicle marked as sold:', response);
-        this.fetchSellerListings(this.user.id); // Reload listings
+        this.fetchSellerListings(); // Reload listings
       },
       error: (error) => {
         console.error('Error marking vehicle as sold:', error);

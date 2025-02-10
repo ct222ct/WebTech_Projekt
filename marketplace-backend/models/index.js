@@ -29,53 +29,7 @@ db.Sequelize = Sequelize;
     try {
         await sequelize.authenticate();
         console.log('Datenbankverbindung hergestellt.');
-        /*
-                // Synchronisation der Tabellen
-                await sequelize.sync({ alter: true });// Tabellenstruktur aktualisieren, ohne Daten zu löschen
-                console.log('Tabellen erfolgrch synchronisiert.');
 
-                // Zusätzliche Initialisierungen
-                const Category = db.Category;
-                const Mark = db.Mark;
-                const Model = db.Model;
-
-                // Kategorien hinzufügen
-                const categories = ['Cars', 'Motorbikes'];
-                for (const categoryName of categories) {
-                    const [category] = await Category.findOrCreate({
-                        where: { name: categoryName },
-                        defaults: { name: categoryName },
-                    });
-                    console.log(`Kategorie hinzugefügt oder existiert bereits: ${categoryName}`);
-
-                    // Beispiel-Markierungen und Modelle hinzufügen
-                    if (categoryName === 'Cars') {
-                        const marks = ['Audi', 'BMW', 'Mercedes-Benz'];
-                        for (const markName of marks) {
-                            const [mark] = await Mark.findOrCreate({
-                                where: { name: markName, categoryId: category.id },
-                                defaults: { name: markName, categoryId: category.id },
-                            });
-                            console.log(`Marke hinzugefügt oder existiert bereits: ${markName}`);
-
-                            const models = {
-                                Audi: ['A3', 'A4', 'Q5'],
-                                BMW: ['X1', 'X3', 'X5'],
-                                'Mercedes-Benz': ['C-Class', 'E-Class'],
-                            };
-
-                            if (models[markName]) {
-                                for (const modelName of models[markName]) {
-                                    await Model.findOrCreate({
-                                        where: { name: modelName, markId: mark.id },
-                                        defaults: { name: modelName, markId: mark.id },
-                                    });
-                                    console.log(`Modell hinzugefügt oder existiert bereits: ${modelName}`);
-                                }
-                            }
-                        }
-                    }
-                }*/
     } catch (error) {
         console.error('Fehler beim Initialisieren der Datenbank:', error);
     }

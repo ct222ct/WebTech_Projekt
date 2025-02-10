@@ -124,21 +124,22 @@ const deleteVehicle = async (req, res) => {
 
 const getSellerListings = async (req, res) => {
     try {
-        const userId = req.query.userId; // Get userId from query parameter
+        console.log('Abruf der Fahrzeuge für Benutzer-ID:', req.user.id);
 
-        if (!userId) {
-            return res.status(400).json({ error: 'User ID is required' });
-        }
-
-        const listings = await Vehicle.findAll({
-            where: { userId },
-            include: [{ model: VehiclePicture, as: 'pictures' }],
+        const vehicles = await Vehicle.findAll({
+            where: { userId: req.user.id },
         });
 
-        res.json(listings);
+        if (!vehicles.length) {
+            console.log('Keine Fahrzeuge gefunden.');
+            return res.json([]);
+        }
+
+        console.log('Gefundene Fahrzeuge:', vehicles);
+        res.json(vehicles);
     } catch (error) {
-        console.error('Error fetching seller listings:', error);
-        res.status(500).json({ error: 'Error fetching seller listings' });
+        console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+        res.status(500).json({ message: 'Serverfehler' });
     }
 };
 
