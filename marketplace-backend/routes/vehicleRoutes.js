@@ -59,10 +59,6 @@ router.get('/', getVehiclesByType, authMiddleware);
 // Route to get seller's vehicle listings
 router.get('/seller/listings', authMiddleware, getSellerListings);
 
-// Routes to add, update, and delete vehicles with pictures
-//router.post('/', upload.array('pictures'), addVehicle);
-router.put('/:id', upload.array('pictures'), updateVehicle);
-
 
 // Route to mark a vehicle as sold
 router.put('/mark-sold/:vehicleId', authMiddleware, markAsSold);
@@ -91,6 +87,7 @@ router.get('/types', async (req, res) => {
 
 router.post('/', authMiddleware, addVehicle); // Add a vehicle
 router.put('/:id', authMiddleware, updateVehicle); // Update a vehicle
-router.delete('/:id', deleteVehicle);
+router.delete('/:id', authMiddleware, deleteVehicle);
+
 
 module.exports = router;

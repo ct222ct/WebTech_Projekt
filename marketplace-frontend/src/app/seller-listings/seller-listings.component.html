@@ -21,8 +21,8 @@
       <button *ngIf="!vehicles.sold" (click)="markAsSold(vehicles.id)">Mark as Sold</button>
       <div class="pictures">
         <img *ngFor="let picture of vehicles.pictures" [src]="picture.url" alt="Vehicle Picture" />
-        <button (click)="updateVehicle(vehicles)">Update</button>
         <button (click)="deleteVehicle(vehicles.id)" class="delete-btn">Delete</button>
+        <button (click)="openEditModal(vehicles)">Update</button>
       </div>
     </div>
   </div>
@@ -57,6 +57,35 @@
       <div class="modal-buttons">
         <button (click)="addVehicle()">Save</button>
         <button class="close-btn" (click)="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPDATE POPUP -->
+  <div class="modal" *ngIf="isEditModalOpen">
+    <div class="modal-content">
+      <h3>Edit Vehicle</h3>
+      <input type="text" placeholder="Name" [(ngModel)]="editedVehicle.name" />
+
+      <select [(ngModel)]="editedVehicle.modelId">
+        <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+      </select>
+
+      <select [(ngModel)]="editedVehicle.typeId">
+        <option *ngFor="let type of types" [value]="type.id">{{ type.name }}</option>
+      </select>
+
+      <textarea placeholder="Description" [(ngModel)]="editedVehicle.description"></textarea>
+      <input type="number" placeholder="Price" [(ngModel)]="editedVehicle.price" />
+      <input type="date" placeholder="First Registration" [(ngModel)]="editedVehicle.dateOfFirstRegistration" />
+      <input type="number" placeholder="Mileage" [(ngModel)]="editedVehicle.mileage" />
+      <input type="text" placeholder="Fuel Type" [(ngModel)]="editedVehicle.fuelType" />
+      <input type="text" placeholder="Color" [(ngModel)]="editedVehicle.color" />
+      <input type="text" placeholder="Condition" [(ngModel)]="editedVehicle.condition" />
+
+      <div class="modal-buttons">
+        <button (click)="updateVehicle()">Save</button>
+        <button class="close-btn" (click)="closeEditModal()">Cancel</button>
       </div>
     </div>
   </div>

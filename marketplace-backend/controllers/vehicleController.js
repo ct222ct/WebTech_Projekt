@@ -71,62 +71,94 @@ const updateVehicle = async (req, res) => {
         const { id } = req.params;
         const {
             name,
-            model,
-            type,
+            modelId,
+            typeId,
             description,
             price,
             dateOfFirstRegistration,
             mileage,
             fuelType,
             color,
-            condition,
+            condition
         } = req.body;
 
-        const vehicle = await Vehicle.findByPk(id);
-        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+        console.log(`🔄 Fahrzeug-Update gestartet für ID: ${id}`);
 
-        if (vehicle.userId !== req.user.id) {
-            return res.status(403).json({ message: 'Unauthorized' });
+        // 🚨 Prüfen, ob das Token korrekt übermittelt wurde
+        if (!req.user || !req.user.id) {
+            console.error('❌ Benutzer-ID fehlt im Token!');
+            return res.status(401).json({ message: 'Unauthorized: Benutzer-ID fehlt' });
         }
 
+        const userId = req.user.id;
+        console.log(`🔑 Benutzer-ID: ${userId}`);
+
+        // Fahrzeug suchen
+        const vehicle = await Vehicle.findByPk(id);
+        if (!vehicle) {
+            return res.status(404).json({ message: 'Fahrzeug nicht gefunden' });
+        }
+
+        // Prüfen, ob das Fahrzeug dem angemeldeten Benutzer gehört
+        if (vehicle.userId !== userId) {
+            return res.status(403).json({ message: 'Nicht berechtigt, dieses Fahrzeug zu bearbeiten' });
+        }
+
+        // Fahrzeugdaten aktualisieren
         await vehicle.update({
             name,
-            model,
-            type,
+            modelId,
+            typeId,
             description,
             price,
             dateOfFirstRegistration,
             mileage,
             fuelType,
             color,
-            condition,
+            condition
         });
 
-        res.json(vehicle);
+        console.log(`✅ Fahrzeug erfolgreich aktualisiert: ${vehicle.id}`);
+        res.json({ message: 'Fahrzeug aktualisiert', vehicle });
     } catch (error) {
-        console.error('Error updating vehicle:', error);
-        res.status(500).json({ error: 'Error updating vehicle' });
+        console.error('❌ Fehler beim Aktualisieren des Fahrzeugs:', error);
+        res.status(500).json({ message: 'Fehler beim Fahrzeug-Update' });
     }
 };
+
 
 const deleteVehicle = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // 🔹 Sicherstellen, dass der Benutzer authentifiziert ist
+        if (!req.user || !req.user.id) {
+            console.error('❌ Kein Benutzer-Token empfangen');
+            return res.status(401).json({ message: 'Unauthorized: Kein Benutzer gefunden' });
+        }
+
+        console.log('🗑 Fahrzeug löschen mit ID:', id, 'von Benutzer-ID:', req.user.id);
+
         const vehicle = await Vehicle.findByPk(id);
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Fahrzeug nicht gefunden' });
+        }
 
-        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
-
+        // 🔹 Überprüfung, ob das Fahrzeug dem Benutzer gehört
         if (vehicle.userId !== req.user.id) {
-            return res.status(403).json({ message: 'Unauthorized' });
+            console.error('❌ Unberechtigter Löschversuch');
+            return res.status(403).json({ message: 'Unberechtigt: Dieses Fahrzeug gehört nicht dir' });
         }
 
         await vehicle.destroy();
-        res.status(204).send();
+        console.log('✅ Fahrzeug erfolgreich gelöscht:', id);
+        res.status(200).json({ message: 'Fahrzeug erfolgreich gelöscht' });
     } catch (error) {
-        console.error('Error deleting vehicle:', error);
-        res.status(500).json({ error: 'Error deleting vehicle' });
+        console.error('❌ Fehler beim Löschen des Fahrzeugs:', error);
+        res.status(500).json({ error: 'Fehler beim Löschen des Fahrzeugs' });
     }
 };
+
 
 const getSellerListings = async (req, res) => {
     try {

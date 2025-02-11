@@ -34,6 +34,8 @@ export class SellerListingsComponent implements OnInit {
     condition: '',
     images: []
   };
+  editedVehicle: any = {}; // Hier werden die vorhandenen Fahrzeugdaten gespeichert
+  isEditModalOpen: boolean = false; // Steuert die Sichtbarkeit des Bearbeitungsmodals
 
   constructor(private http: HttpClient, private userService: UserService) {}
 
@@ -124,26 +126,26 @@ export class SellerListingsComponent implements OnInit {
   addVehicle(): void {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('🚨 Kein Token gefunden! Benutzer ist nicht eingeloggt.');
+      console.error('Kein Token gefunden! Benutzer ist nicht eingeloggt.');
       return;
     }
 
     this.userService.getUserData().subscribe(user => {
-      console.log('🔑 Benutzer-ID erhalten:', user.id);
+      console.log('Benutzer-ID erhalten:', user.id);
 
-      this.newVehicle.userId = user.id; // ✅ Benutzer-ID setzen
+      this.newVehicle.userId = user.id; //  Benutzer-ID setzen
 
       this.http.post('http://localhost:3000/api/vehicles', this.newVehicle, {
         headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
       }).subscribe({
         next: (vehicle) => {
-          console.log('✅ Fahrzeug erfolgreich hinzugefügt:', vehicle);
+          console.log('Fahrzeug erfolgreich hinzugefügt:', vehicle);
           this.vehicles.push(vehicle);
           this.newVehicle = {}; // Reset form
           this.closeModal();
         },
         error: (error) => {
-          console.error('❌ Fehler beim Hinzufügen des Fahrzeugs:', error);
+          console.error('Fehler beim Hinzufügen des Fahrzeugs:', error);
         }
       });
     });
@@ -151,25 +153,58 @@ export class SellerListingsComponent implements OnInit {
 
 
 
-  updateVehicle(vehicle: any): void {
-    this.http.put(`http://localhost:3000/api/vehicles/${vehicle.id}`, vehicle).subscribe({
+  openEditModal(vehicle: any): void {
+    this.editedVehicle = { ...vehicle }; // Kopie der Fahrzeugdaten speichern
+    this.isEditModalOpen = true;
+  }
+
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+  }
+
+  updateVehicle(): void {
+    const token = localStorage.getItem('token'); // Token aus LocalStorage abrufen
+    if (!token) {
+      console.error('❌ Kein Token gefunden!');
+      return;
+    }
+
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    this.http.put(`http://localhost:3000/api/vehicles/${this.editedVehicle.id}`, this.editedVehicle, { headers })
+      .subscribe({
+        next: () => {
+          console.log('✅ Fahrzeug erfolgreich aktualisiert.');
+          this.fetchSellerListings(); // Fahrzeugliste neu laden
+          this.closeEditModal(); // Modal schließen
+        },
+        error: (error) => {
+          console.error('❌ Fehler beim Aktualisieren des Fahrzeugs:', error);
+        }
+      });
+  }
+
+
+  deleteVehicle(vehicleId: number): void {
+    const token = localStorage.getItem('token'); // 🔹 Token abrufen
+    if (!token) {
+      console.error('❌ Kein Token gefunden im LocalStorage');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+
+    this.http.delete(`http://localhost:3000/api/vehicles/${vehicleId}`, { headers }).subscribe({
       next: () => {
-        console.log('Fahrzeug aktualisiert.');
+        this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
+        console.log('✅ Fahrzeug erfolgreich gelöscht:', vehicleId);
       },
       error: (error) => {
-        console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
+        console.error('❌ Fehler beim Löschen des Fahrzeugs:', error);
       }
     });
   }
 
-  deleteVehicle(vehicleId: number): void {
-    this.http.delete(`http://localhost:3000/api/vehicles/${vehicleId}`).subscribe({
-      next: () => {
-        this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
-      },
-      error: (error) => {
-        console.error('Fehler beim Löschen des Fahrzeugs:', error);
-      }
-    });
-  }
 }
