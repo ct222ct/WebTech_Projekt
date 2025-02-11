@@ -10,6 +10,8 @@
     You have no listings.
   </div>
 
+  <button class="open-modal-btn" (click)="openModal()">Add Vehicle</button>
+
   <div *ngIf="!isLoading && vehicles.length > 0" class="listings">
     <div *ngFor="let vehicles of vehicles" class="listing-card">
       <h3>{{ vehicles.name }}</h3>
@@ -19,7 +21,42 @@
       <button *ngIf="!vehicles.sold" (click)="markAsSold(vehicles.id)">Mark as Sold</button>
       <div class="pictures">
         <img *ngFor="let picture of vehicles.pictures" [src]="picture.url" alt="Vehicle Picture" />
+        <button (click)="updateVehicle(vehicles)">Update</button>
+        <button (click)="deleteVehicle(vehicles.id)" class="delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
 
+
+  <!-- Popup Modal -->
+  <div class="modal" *ngIf="isModalOpen">
+    <div class="modal-content">
+      <h3>Add New Vehicle</h3>
+      <input type="text" placeholder="Name" [(ngModel)]="newVehicle.name" />
+
+      <!-- Dropdown for Model -->
+      <select [(ngModel)]="newVehicle.modelId">
+        <option value="" disabled selected>Select Model</option>
+        <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+      </select>
+
+      <!-- Dropdown for Type -->
+      <select [(ngModel)]="newVehicle.typeId">
+        <option value="" disabled selected>Select Type</option>
+        <option *ngFor="let type of types" [value]="type.id">{{ type.name }}</option>
+      </select>
+
+      <textarea placeholder="Description" [(ngModel)]="newVehicle.description"></textarea>
+      <input type="number" placeholder="Price" [(ngModel)]="newVehicle.price" />
+      <input type="date" placeholder="First Registration" [(ngModel)]="newVehicle.dateOfFirstRegistration" />
+      <input type="number" placeholder="Mileage" [(ngModel)]="newVehicle.mileage" />
+      <input type="text" placeholder="Fuel Type" [(ngModel)]="newVehicle.fuelType" />
+      <input type="text" placeholder="Color" [(ngModel)]="newVehicle.color" />
+      <input type="text" placeholder="Condition" [(ngModel)]="newVehicle.condition" />
+
+      <div class="modal-buttons">
+        <button (click)="addVehicle()">Save</button>
+        <button class="close-btn" (click)="closeModal()">Cancel</button>
       </div>
     </div>
   </div>

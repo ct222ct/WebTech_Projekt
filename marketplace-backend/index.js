@@ -10,6 +10,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
 const multer = require('multer');
 const path = require('path');
+const bodyParser = require('body-parser');
 
 // Configure multer
 const storage = multer.diskStorage({
@@ -28,6 +29,7 @@ app.use(cors()); // CORS-Middleware aktivieren
 // Middleware
 app.use(json());
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 sequelize.sync({ alter: true });
@@ -60,7 +62,11 @@ app.get('/api/categories/:categoryId/marks', async (req, res) => {
 
 
 app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
-app.use('/api/vehicles', vehicleRoutes); // Endpunkt für Fahrzeuge registrieren
+const modelRoutes = require('./routes/modelRoutes');
+app.use('/api/models', modelRoutes);
+const typeRoutes = require('./routes/typeRoutes');
+app.use('/api/types', typeRoutes);
+
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

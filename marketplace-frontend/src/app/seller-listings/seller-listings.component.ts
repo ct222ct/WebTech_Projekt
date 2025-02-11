@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { UserService } from '../services/user.service';
-import {NgForOf, NgIf} from '@angular/common'; // Import UserService
+import {NgForOf, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms'; // Import UserService
 
 @Component({
   selector: 'app-seller-listings',
@@ -9,19 +10,36 @@ import {NgForOf, NgIf} from '@angular/common'; // Import UserService
   styleUrls: ['./seller-listings.component.less'],
   imports: [
     NgIf,
-    NgForOf
+    NgForOf,
+    FormsModule
   ]
 })
 export class SellerListingsComponent implements OnInit {
-  listings: any[] = [];
   isLoading: boolean = true;
   user: any = null;
   vehicles: any[] = [];
+  isModalOpen: boolean = false; // Controls modal visibility
+  models: any[] = []; // Models from DB
+  types: any[] = []; // Types from DB
+  newVehicle: any = {
+    name: '',
+    modelId: '', // Will be selected from dropdown
+    typeId: '', // Will be selected from dropdown
+    description: '',
+    price: 0,
+    dateOfFirstRegistration: '',
+    mileage: 0,
+    fuelType: '',
+    color: '',
+    condition: '',
+    images: []
+  };
 
   constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit(): void {
     this.loadUserAndListings();
+    this.loadModelsAndTypes();
 
   }
 
@@ -58,8 +76,6 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
-
-
   markAsSold(vehicleId: number): void {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
@@ -74,5 +90,86 @@ export class SellerListingsComponent implements OnInit {
       });
   }
 
+  openModal(): void {
+    this.isModalOpen = true;
+  }
 
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
+
+  loadModelsAndTypes(): void {
+    // Lade die Modelle
+    this.http.get<any[]>('http://localhost:3000/api/models').subscribe({
+      next: (data) => {
+        this.models = data;
+        console.log('Geladene Modelle:', this.models);
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Modelle:', error);
+      }
+    });
+
+    // Lade die Typen
+    this.http.get<any[]>('http://localhost:3000/api/types').subscribe({
+      next: (data) => {
+        this.types = data;
+        console.log('Geladene Typen:', this.types);
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Typen:', error);
+      }
+    });
+  }
+  addVehicle(): void {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('🚨 Kein Token gefunden! Benutzer ist nicht eingeloggt.');
+      return;
+    }
+
+    this.userService.getUserData().subscribe(user => {
+      console.log('🔑 Benutzer-ID erhalten:', user.id);
+
+      this.newVehicle.userId = user.id; // ✅ Benutzer-ID setzen
+
+      this.http.post('http://localhost:3000/api/vehicles', this.newVehicle, {
+        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+      }).subscribe({
+        next: (vehicle) => {
+          console.log('✅ Fahrzeug erfolgreich hinzugefügt:', vehicle);
+          this.vehicles.push(vehicle);
+          this.newVehicle = {}; // Reset form
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('❌ Fehler beim Hinzufügen des Fahrzeugs:', error);
+        }
+      });
+    });
+  }
+
+
+
+  updateVehicle(vehicle: any): void {
+    this.http.put(`http://localhost:3000/api/vehicles/${vehicle.id}`, vehicle).subscribe({
+      next: () => {
+        console.log('Fahrzeug aktualisiert.');
+      },
+      error: (error) => {
+        console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
+      }
+    });
+  }
+
+  deleteVehicle(vehicleId: number): void {
+    this.http.delete(`http://localhost:3000/api/vehicles/${vehicleId}`).subscribe({
+      next: () => {
+        this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
+      },
+      error: (error) => {
+        console.error('Fehler beim Löschen des Fahrzeugs:', error);
+      }
+    });
+  }
 }

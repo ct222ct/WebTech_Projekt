@@ -54,20 +54,43 @@ router.get('/types/:id', async (req, res) => {
   }
 });
 // Route to handle vehicles by type
-router.get('/', getVehiclesByType, authMiddleware, markAsSold);
+router.get('/', getVehiclesByType, authMiddleware);
 
 // Route to get seller's vehicle listings
 router.get('/seller/listings', authMiddleware, getSellerListings);
 
 // Routes to add, update, and delete vehicles with pictures
-router.post('/', upload.array('pictures'), addVehicle);
+//router.post('/', upload.array('pictures'), addVehicle);
 router.put('/:id', upload.array('pictures'), updateVehicle);
-router.delete('/:id', deleteVehicle);
-
 
 
 // Route to mark a vehicle as sold
 router.put('/mark-sold/:vehicleId', authMiddleware, markAsSold);
 
+// Alle Modelle abrufen
+router.get('/models', async (req, res) => {
+  try {
+    const models = await Model.findAll();
+    res.json(models);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Modelle:', error);
+    res.status(500).json({ error: 'Serverfehler beim Abrufen der Modelle' });
+  }
+});
+
+// Alle Fahrzeugtypen abrufen
+router.get('/types', async (req, res) => {
+  try {
+    const types = await Type.findAll();
+    res.json(types);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Typen:', error);
+    res.status(500).json({ error: 'Serverfehler beim Abrufen der Typen' });
+  }
+});
+
+router.post('/', authMiddleware, addVehicle); // Add a vehicle
+router.put('/:id', authMiddleware, updateVehicle); // Update a vehicle
+router.delete('/:id', deleteVehicle);
 
 module.exports = router;

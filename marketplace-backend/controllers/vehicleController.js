@@ -1,5 +1,6 @@
 const { Vehicle } = require('../models'); // Importieren des Modells
 const { VehiclePicture } = require('../models'); // Importieren des Modells
+const { User } = require('../models/user');
 
 
 const getVehiclesByType = async (req, res) => {
@@ -29,24 +30,21 @@ const getVehiclesByType = async (req, res) => {
 
 const addVehicle = async (req, res) => {
     try {
-        const {
-            name,
-            model,
-            type,
-            description,
-            price,
-            dateOfFirstRegistration,
-            mileage,
-            fuelType,
-            color,
-            condition,
-            categoryId,
-        } = req.body;
+        const { name, modelId, typeId, description, price, dateOfFirstRegistration, mileage, fuelType, color, condition } = req.body;
+
+        // 🚨 Benutzer-ID aus Token holen
+        const userId = req.user.id;
+        if (!userId) {
+            return res.status(401).json({ message: 'Unauthorized: Benutzer-ID fehlt' });
+        }
+
+        console.log('🚗 Fahrzeugdaten:', req.body);
+        console.log('🔑 Benutzer-ID:', userId);
 
         const vehicle = await Vehicle.create({
             name,
-            model,
-            type,
+            modelId,
+            typeId,
             description,
             price,
             dateOfFirstRegistration,
@@ -54,21 +52,19 @@ const addVehicle = async (req, res) => {
             fuelType,
             color,
             condition,
-            categoryId,
+            userId, // Benutzer-ID setzen
         });
-
-        // Save uploaded pictures
-        const pictureUrls = req.files.map((file) => `/uploads/${file.filename}`);
-        for (const url of pictureUrls) {
-            await VehiclePicture.create({ vehicleId: vehicle.id, url });
-        }
 
         res.status(201).json(vehicle);
     } catch (error) {
-        console.error('Error adding vehicle:', error);
-        res.status(500).json({ error: 'Error adding vehicle' });
+        console.error('❌ Fehler beim Speichern des Fahrzeugs:', error);
+        res.status(500).json({ message: 'Fehler beim Speichern des Fahrzeugs.' });
     }
 };
+
+
+
+
 
 const updateVehicle = async (req, res) => {
     try {
@@ -84,12 +80,13 @@ const updateVehicle = async (req, res) => {
             fuelType,
             color,
             condition,
-            categoryId,
         } = req.body;
 
         const vehicle = await Vehicle.findByPk(id);
-        if (!vehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
+        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+
+        if (vehicle.userId !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized' });
         }
 
         await vehicle.update({
@@ -103,7 +100,6 @@ const updateVehicle = async (req, res) => {
             fuelType,
             color,
             condition,
-            categoryId,
         });
 
         res.json(vehicle);
@@ -116,10 +112,12 @@ const updateVehicle = async (req, res) => {
 const deleteVehicle = async (req, res) => {
     try {
         const { id } = req.params;
-
         const vehicle = await Vehicle.findByPk(id);
-        if (!vehicle) {
-            return res.status(404).json({ error: 'Vehicle not found' });
+
+        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+
+        if (vehicle.userId !== req.user.id) {
+            return res.status(403).json({ message: 'Unauthorized' });
         }
 
         await vehicle.destroy();
@@ -150,7 +148,6 @@ const getSellerListings = async (req, res) => {
         res.status(500).json({ message: 'Serverfehler' });
     }
 };
-
 
 const markAsSold = async (req, res) => {
     try {
