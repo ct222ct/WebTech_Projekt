@@ -85,9 +85,51 @@ router.get('/types', async (req, res) => {
   }
 });
 
+router.get('/browse', async (req, res) => {
+  try {
+    const { categoryId, markId, modelId } = req.query;
+
+    let filters = {};
+    if (categoryId) filters.categoryId = categoryId;
+    if (markId) filters.markId = markId;
+    if (modelId) filters.modelId = modelId;
+
+    const vehicles = await Vehicle.findAll({
+      where: filters,
+      include: [
+        { model: Model, attributes: ['name'] },
+        { model: Mark, attributes: ['name'] },
+      ],
+      attributes: ['id', 'name', 'price', 'mileage', 'dateOfFirstRegistration'],
+    });
+
+    res.json(vehicles);
+  } catch (error) {
+    console.error('❌ Error fetching vehicles:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 router.post('/', authMiddleware, addVehicle); // Add a vehicle
 router.put('/:id', authMiddleware, updateVehicle); // Update a vehicle
 router.delete('/:id', authMiddleware, deleteVehicle);
 
+router.get('/categories/:categoryId/marks', async (req, res) => {
+  const { categoryId } = req.params;
+  const marks = await Mark.findAll({ where: { categoryId } });
+  res.json(marks);
+});
+
+router.get('/marks/:markId/models', async (req, res) => {
+  const { markId } = req.params;
+  const models = await Model.findAll({ where: { markId } });
+  res.json(models);
+});
+
+router.get('/models/:modelId/vehicles', async (req, res) => {
+  const { modelId } = req.params;
+  const vehicles = await Vehicle.findAll({ where: { modelId } });
+  res.json(vehicles);
+});
 
 module.exports = router;

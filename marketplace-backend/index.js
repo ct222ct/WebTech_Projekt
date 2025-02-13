@@ -66,10 +66,20 @@ const modelRoutes = require('./routes/modelRoutes');
 app.use('/api/models', modelRoutes);
 const typeRoutes = require('./routes/typeRoutes');
 app.use('/api/types', typeRoutes);
+const modelRoutes = require('./routes/modelRoutes');
+app.use('/api/models', modelRoutes);
 
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+
+
+const markRoutes = require('./routes/markRoutes');
+app.use('/api', markRoutes);
+
+
 
 // Datenbank synchronisieren
 (async () => {

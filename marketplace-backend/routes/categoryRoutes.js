@@ -33,6 +33,8 @@ router.get('/:id/marks', async (req, res) => {
     }
 });
 
+
+
 // Route: Kategorie mit Details abrufen
 router.get('/:id', categoryController.getCategoryDetails);
 
