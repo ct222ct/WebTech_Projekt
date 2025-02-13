@@ -1,57 +1,49 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatInputModule, MatButtonModule],
-  template: `
-    <mat-card>
-      <h2>Registrieren</h2>
-      <form (ngSubmit)="register()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="user.email" name="email" required />
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Passwort</mat-label>
-          <input matInput [(ngModel)]="user.password" name="password" type="password" required />
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Adresse</mat-label>
-          <input matInput [(ngModel)]="user.address" name="address" required />
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Registrieren</button>
-      </form>
-    </mat-card>
-  `,
-  styles: [
-    `
-      mat-card {
-        max-width: 400px;
-        margin: 20px auto;
-        padding: 20px;
-      }
-      .full-width {
-        width: 100%;
-      }
-    `,
-  ],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.less'],
+  imports: [
+    FormsModule,
+    NgIf
+  ]
 })
 export class RegisterComponent {
-  user = { email: '', password: '', address: '' };
+  name: string = '';
+  email: string = '';
+  password: string = '';
+  address: string = '';
+  errorMessage: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private userService: UserService, private router: Router) {}
 
-  register() {
-    this.http.post('http://localhost:3000/api/register', this.user).subscribe(
-      response => console.log('Registrierung erfolgreich', response),
-      error => console.error('Fehler bei der Registrierung', error)
+  register(): void {
+    if (!this.name || !this.email || !this.password || !this.address) {
+      this.errorMessage = 'Bitte füllen Sie alle Felder aus.';
+      return;
+    }
+
+    const newUser = {
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      address: this.address,
+    };
+
+    this.userService.register(newUser).subscribe(
+      () => {
+        alert('Registrierung erfolgreich!');
+        this.router.navigate(['/login']);
+      },
+      (error) => {
+        console.error('Fehler bei der Registrierung:', error);
+        this.errorMessage = 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+      }
     );
   }
 }

@@ -1,0 +1,40 @@
+<form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
+  <label>Name:</label>
+  <input formControlName="name" type="text" required />
+
+  <label>Model:</label>
+  <input formControlName="model" type="text" required />
+
+  <label>Type:</label>
+  <input formControlName="type" type="text" required />
+
+  <label>Description:</label>
+  <textarea formControlName="description"></textarea>
+
+  <label>Price:</label>
+  <input formControlName="price" type="number" required />
+
+  <label>Date of First Registration:</label>
+  <input formControlName="dateOfFirstRegistration" type="date" required />
+
+  <label>Mileage:</label>
+  <input formControlName="mileage" type="number" required />
+
+  <label>Fuel Type:</label>
+  <input formControlName="fuelType" type="text" required />
+
+  <label>Color:</label>
+  <input formControlName="color" type="text" required />
+
+  <label>Condition:</label>
+  <select formControlName="condition">
+    <option value="new">New</option>
+    <option value="used">Used</option>
+    <option value="broken">Broken</option>
+  </select>
+
+  <label>Pictures:</label>
+  <input type="file" (change)="onFileSelect($event)" multiple />
+
+  <button type="submit">Add Vehicle</button>
+</form>

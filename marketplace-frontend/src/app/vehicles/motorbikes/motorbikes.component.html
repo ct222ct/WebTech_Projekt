@@ -1,0 +1,36 @@
+<div class="container">
+  <h2>Auto</h2>
+
+  <!-- Marken-Filter -->
+  <label for="mark">Select Marke:</label>
+  <select id="mark" [(ngModel)]="selectedMark" (change)="loadModels()">
+    <option value="" disabled selected>Choose a Marke</option>
+    <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+  </select>
+
+  <!-- Modell-Filter -->
+  <label for="model">Select Model:</label>
+  <select id="model" [(ngModel)]="selectedModel" [disabled]="!selectedMark">
+    <option value="" selected>Choose a model</option>
+    <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+  </select>
+
+  <!-- Such-Button -->
+  <button (click)="searchVehicles()" [disabled]="!selectedMark">🔍 Suche</button>
+
+  <!-- Ladespinner -->
+  <div *ngIf="isLoading">Daten werden geladen...</div>
+
+  <!-- Fahrzeugliste -->
+  <div *ngIf="!isLoading">
+    <div *ngFor="let vehicle of vehicles" class="vehicle-item">
+      <img *ngIf="vehicle.image" [src]="vehicle.image" alt="Vehicle Image" class="vehicle-img" />
+      <div class="vehicle-info">
+        <h3>{{ vehicle.name }}</h3>
+        <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+        <p><strong>Mileage:</strong> {{ vehicle.mileage }} km</p>
+        <p><strong>First Registration:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
+      </div>
+    </div>
+  </div>
+</div>

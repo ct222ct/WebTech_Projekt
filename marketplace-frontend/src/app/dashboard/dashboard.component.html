@@ -1,0 +1,9 @@
+<div class="container">
+  <h2>Kategorien</h2>
+  <div class="categories-container">
+    <button
+      *ngFor="let category of categories" class="category-button" (click)="viewVehicles(category)">
+      <span>{{ category.name }}</span>
+    </button>
+  </div>
+</div>

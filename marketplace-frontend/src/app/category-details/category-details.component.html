@@ -1,0 +1,12 @@
+<div class="container">
+  <h2>Details für Kategorie: {{ categoryName }}</h2>
+  <h3>Marken</h3>
+  <ul>
+    <li *ngFor="let mark of marks">{{ mark.name }}</li>
+  </ul>
+
+  <h3>Typen</h3>
+  <ul>
+    <li *ngFor="let type of types">{{ type.name }}</li>
+  </ul>
+</div>

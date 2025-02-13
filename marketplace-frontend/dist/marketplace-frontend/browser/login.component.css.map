@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["C:/Apache24/htdocs/Projekt/WebTech_Projekt/marketplace-frontend/src/app/login/login.component.ts"],
+  "sourcesContent": ["\n      mat-card {\n        max-width: 400px;\n        margin: 20px auto;\n        padding: 20px;\n      }\n      .full-width {\n        width: 100%;\n      }\n    "],
+  "mappings": ";AACM;AACE,aAAA;AACA,UAAA,KAAA;AACA,WAAA;;AAEF,CAAA;AACE,SAAA;;",
+  "names": []
+}

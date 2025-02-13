@@ -1,0 +1,36 @@
+<div class="buyer-listings-container">
+  <h2>Browse Listings</h2>
+
+  <div class="filters">
+    <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+      <option value="" disabled selected>Select Category</option>
+      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedMark" (change)="onMarkChange()" [disabled]="!selectedCategory">
+      <option value="" disabled selected>Select Mark</option>
+      <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedModel" [disabled]="!selectedMark">
+      <option value="" disabled selected>Select Model</option>
+      <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+    </select>
+
+    <button (click)="fetchVehicles()" [disabled]="!selectedModel">Search</button>
+  </div>
+
+  <div *ngIf="vehicles.length === 0" class="no-results">
+    No listings available.
+  </div>
+
+  <div *ngFor="let vehicle of vehicles" class="vehicle-card">
+    <img ngSrc="'/uploads/' + vehicle.image" alt="Vehicle Image">
+    <div class="vehicle-info">
+      <h3>{{ vehicle.name }}</h3>
+      <p><strong>Price:</strong> {{ vehicle.price }} €</p>
+      <p><strong>Mileage:</strong> {{ vehicle.mileage }} km</p>
+      <p><strong>First Registration:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
+    </div>
+  </div>
+</div>

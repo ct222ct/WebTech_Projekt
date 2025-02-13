@@ -1,1 +1,31 @@
-<p>home works!</p>
+<div class="home">
+  <header class="header">
+    <h1>Willkommen bei Marketplace</h1>
+    <p>Ihr Marktplatz für Produkte, Immobilien und Fahrzeuge</p>
+  </header>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Was suchen Sie?" class="search-input" />
+    <button class="search-button">Suchen</button>
+  </div>
+
+  <div class="categories">
+    <div class="category">
+      <img src="/assets/icons/products.png" alt="Produkte" />
+      <p>Produkte</p>
+    </div>
+    <div class="category">
+      <img src="/assets/icons/real-estate.png" alt="Immobilien" />
+      <p>Immobilien</p>
+    </div>
+    <div class="category">
+      <img src="/assets/icons/cars.png" alt="Fahrzeuge" />
+      <p>Fahrzeuge</p>
+      <button class="navigate-button" (click)="goToDashboard()">Zur Fahrzeugseite</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 Marketplace. Alle Rechte vorbehalten.</p>
+  </footer>
+</div>

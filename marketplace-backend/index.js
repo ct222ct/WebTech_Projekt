@@ -1,36 +1,95 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const { User } = require('./models');
-require('dotenv').config();
-
+const { sequelize, User } = require('./models'); // User aus models importieren
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const dotenv = require('dotenv');
+// CORS-Middleware aktivieren
+const cors = require('cors');
+const userRoutes = require('./routes/user');
+const {json} = require("express");
+const categoryRoutes = require('./routes/categoryRoutes');
+const vehicleRoutes = require('./routes/vehicleRoutes');
+const multer = require('multer');
+const path = require('path');
+const bodyParser = require('body-parser');
 
-// Testroute, um zu prüfen, ob der Server läuft
-app.get('/', (req, res) => {
-    res.send('Backend läuft erfolgreich!');
+// Configure multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
 });
+const upload = multer({ storage });
+// .env-Konfiguration laden
+dotenv.config();
+// CORS-Middleware aktivieren
+app.use(cors()); // CORS-Middleware aktivieren
+// Middleware
+app.use(json());
 
-// Benutzer registrieren
-app.post('/api/register', async (req, res) => {
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+sequelize.sync({ alter: true });
+// Benutzer-Routen registrieren
+app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes); // Endpunkte für Kategorien
+app.use('/api/vehicles', vehicleRoutes);   // Endpunkte für Fahrzeuge
+
+app.post('/api/users/register', async (req, res) => {
     const { email, password, address } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ email, password: hashedPassword, address });
-        res.status(201).json({ message: 'Benutzer erfolgreich registriert', user: newUser });
+        // Benutzer speichern
+        const newUser = await User.create({
+            email: email,
+            password: password,
+            address: address,
+        });
+        res.status(201).json({ message: 'Registrierung erfolgreich!', user: newUser });
     } catch (error) {
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            res.status(400).json({ error: 'Benutzer mit dieser Email existiert bereits' });
-        } else {
-            res.status(500).json({ error: 'Fehler bei der Registrierung' });
-        }
+        console.error('Fehler beim Speichern:', error);
+        res.status(500).json({ message: 'Fehler beim Speichern der Registrierung.' });
     }
 });
+app.get('/api/categories/:categoryId/marks', async (req, res) => {
+    const categoryId = req.params.categoryId;
+    const marks = await Mark.findAll({ where: { categoryId } });
+    res.json(marks);
+});
 
+
+app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
+const modelRoutes = require('./routes/modelRoutes');
+app.use('/api/models', modelRoutes);
+const typeRoutes = require('./routes/typeRoutes');
+app.use('/api/types', typeRoutes);
+const modelRoutes = require('./routes/modelRoutes');
+app.use('/api/models', modelRoutes);
+
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+
+
+const markRoutes = require('./routes/markRoutes');
+app.use('/api', markRoutes);
+
+
+
+// Datenbank synchronisieren
+(async () => {
+    try {
+        await sequelize.sync({ alter: false }); // Strukturelle Änderungen anwenden, ohne Constraints zu entfernen
+        console.log('Database synchronized successfully!');
+    } catch (error) {
+        console.error('Error during database synchronization:', error);
+    }
+})();
 // Server starten
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));

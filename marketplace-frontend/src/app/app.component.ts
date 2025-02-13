@@ -1,28 +1,38 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from './services/auth.service';
+import {Router, RouterLink, RouterOutlet} from '@angular/router';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterModule, MatToolbarModule, MatButtonModule],
-  template: `
-    <mat-toolbar color="primary">
-      <span>Marketplace</span>
-      <span class="spacer"></span>
-      <a mat-button routerLink="/">Home</a>
-      <a mat-button routerLink="/login">Login</a>
-      <a mat-button routerLink="/register">Register</a>
-    </mat-toolbar>
-    <router-outlet></router-outlet>
-  `,
-  styles: [
-    `
-      .spacer {
-        flex: 1 1 auto;
-      }
-    `,
-  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.less'],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    NgIf,
+  ]
 })
-export class AppComponent {}
+export class AppComponent {
+  isLoggedIn: boolean = false;
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    // Überprüfe den Login-Status beim Laden der Anwendung
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    // Beobachte Änderungen des Login-Status
+    this.authService.isLoggedIn$.subscribe((status) => {
+      this.isLoggedIn = status;
+    });
+  }
+
+  logout(): void {
+    this.authService.logout(); // Benutzer ausloggen
+    this.router.navigate(['/']); // Weiterleitung zur Startseite
+  }
+
+  title = 'Marketplace'; // Füge die Eigenschaft hinzu
+
+}

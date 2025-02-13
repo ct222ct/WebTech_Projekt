@@ -1,61 +1,79 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../services/user.service';
+import {NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
+  templateUrl: './profile.component.html',
   imports: [
-    CommonModule,
-    FormsModule, // Für [(ngModel)]
-    MatCardModule, // Für <mat-card>
-    MatFormFieldModule, // Für <mat-form-field>
-    MatInputModule, // Für matInput
-    MatButtonModule, // Für mat-raised-button
+    NgIf,
+    FormsModule
   ],
-  template: `
-    <mat-card>
-      <h2>Benutzerprofil</h2>
-      <p><strong>Email:</strong> {{ user.email }}</p>
-      <p><strong>Adresse:</strong> {{ user.address }}</p>
-      <form (ngSubmit)="updateProfile()">
-        <mat-form-field class="full-width">
-          <mat-label>Neue Adresse</mat-label>
-          <input matInput [(ngModel)]="newAddress" name="newAddress" />
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Neues Passwort</mat-label>
-          <input matInput [(ngModel)]="newPassword" name="newPassword" type="password" />
-        </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Aktualisieren</button>
-      </form>
-    </mat-card>
-  `,
-  styles: [
-    `
-      mat-card {
-        max-width: 400px;
-        margin: auto;
-        padding: 20px;
-      }
-      .full-width {
-        width: 100%;
-      }
-    `,
-  ],
+  styleUrls: ['./profile.component.less']
 })
-export class ProfileComponent {
-  user = { email: '', address: '' };
-  newPassword = '';
-  newAddress = '';
+export class ProfileComponent implements OnInit {
+  user = {
+    name: '',
+    email: '',
+    address: '',
+    password: '',
+    confirmPassword: ''
+  };
+  errorMessage: string | null = null;
+  isEditMode: boolean = false; // Bearbeitungsmodus steuern
 
-  constructor() {}
+  constructor(private userService: UserService) {}
 
-  updateProfile() {
-    console.log('Profil aktualisiert', this.newAddress, this.newPassword);
+  ngOnInit(): void {
+    this.loadUserData();
+  }
+
+  loadUserData(): void {
+    this.userService.getUserData().subscribe(
+      (data) => {
+        this.user.name = data.name;
+        this.user.email = data.email;
+        this.user.address = data.address;
+      },
+      (error) => {
+        console.error('Fehler beim Laden der Benutzerdaten:', error);
+        this.errorMessage = 'Die Benutzerdaten konnten nicht geladen werden.';
+      }
+    );
+  }
+
+  toggleEditMode(): void {
+    this.isEditMode = !this.isEditMode; // Bearbeitungsmodus umschalten
+    if (!this.isEditMode) {
+      // Wenn der Bearbeitungsmodus deaktiviert wird, lade die Originaldaten erneut
+      this.loadUserData();
+    }
+  }
+
+  saveProfile(): void {
+    if (this.user.password && this.user.password !== this.user.confirmPassword) {
+      this.errorMessage = 'Die Passwörter stimmen nicht überein.';
+      return;
+    }
+
+    const updatedData = {
+      name: this.user.name,
+      email: this.user.email,
+      address: this.user.address,
+      password: this.user.password
+    };
+
+    this.userService.updateUserData(updatedData).subscribe(
+      () => {
+        alert('Profil erfolgreich aktualisiert');
+        this.errorMessage = null;
+        this.isEditMode = false; // Bearbeitungsmodus deaktivieren
+      },
+      (error) => {
+        console.error('Fehler beim Speichern der Benutzerdaten:', error);
+        this.errorMessage = 'Das Profil konnte nicht aktualisiert werden.';
+      }
+    );
   }
 }

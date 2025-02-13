@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["C:/Apache24/htdocs/Projekt/WebTech_Projekt/marketplace-frontend/src/app/app.component.ts"],
+  "sourcesContent": ["\n      .spacer {\n        flex: 1 1 auto;\n      }\n    "],
+  "mappings": ";AACM,CAAA;AACE,QAAA,EAAA,EAAA;;",
+  "names": []
+}

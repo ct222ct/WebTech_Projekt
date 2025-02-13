@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+import{Na as c,db as t,eb as n,tb as i}from"./chunk-666GVEXQ.mjs";import"./chunk-X2SEQXRR.mjs";var a=class o{static \u0275fac=function(e){return new(e||o)};static \u0275cmp=c({type:o,selectors:[["app-vehicles"]],decls:4,vars:0,template:function(e,l){e&1&&(t(0,"h1"),i(1,"Fahrzeuge"),n(),t(2,"p"),i(3,"Hier k\xF6nnen Sie Fahrzeuge durchsuchen."),n())},encapsulation:2})};export{a as VehiclesComponent};

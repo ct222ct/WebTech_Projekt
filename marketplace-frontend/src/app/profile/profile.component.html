@@ -1,1 +1,78 @@
-<p>profile works!</p>
+<div class="profile-container">
+  <h2>Mein Profil</h2>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <form>
+    <div>
+      <label for="name">Name:</label>
+      <input
+        type="text"
+        id="name"
+        [(ngModel)]="user.name"
+        name="name"
+        [disabled]="!isEditMode" />
+    </div>
+
+    <div>
+      <label for="email">E-Mail:</label>
+      <input
+        type="email"
+        id="email"
+        [(ngModel)]="user.email"
+        name="email"
+        [disabled]="!isEditMode" />
+    </div>
+
+    <div>
+      <label for="address">Adresse:</label>
+      <input
+        type="text"
+        id="address"
+        [(ngModel)]="user.address"
+        name="address"
+        [disabled]="!isEditMode" />
+    </div>
+
+    <div *ngIf="isEditMode">
+      <label for="password">Neues Passwort:</label>
+      <input
+        type="password"
+        id="password"
+        [(ngModel)]="user.password"
+        name="password" />
+    </div>
+
+    <div *ngIf="isEditMode">
+      <label for="confirmPassword">Passwort bestätigen:</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        [(ngModel)]="user.confirmPassword"
+        name="confirmPassword" />
+    </div>
+
+    <div class="button-group">
+      <button
+        type="button"
+        (click)="toggleEditMode()"
+        *ngIf="!isEditMode">
+        Bearbeiten
+      </button>
+
+      <button
+        type="button"
+        (click)="saveProfile()"
+        *ngIf="isEditMode">
+        Speichern
+      </button>
+
+      <button
+        type="button"
+        (click)="toggleEditMode()"
+        *ngIf="isEditMode">
+        Abbrechen
+      </button>
+    </div>
+  </form>
+</div>
