@@ -23,8 +23,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        address: {
+        street: {
             type: DataTypes.STRING,
+            allowNull: false,
+        },
+        city: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        postalCode: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
     }, {
@@ -38,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         },
     });
 
-// Assoziationen
+    // Assoziationen
     User.associate = (models) => {
         console.log('Initialisiere Assoziation für User mit Vehicle'); // Debugging
         User.hasMany(models.Vehicle, { foreignKey: 'userId', as: 'vehicles' });

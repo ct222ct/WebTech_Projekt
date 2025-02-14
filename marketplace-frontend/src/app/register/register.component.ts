@@ -17,13 +17,15 @@ export class RegisterComponent {
   name: string = '';
   email: string = '';
   password: string = '';
-  address: string = '';
-  errorMessage: string | null = null;
+  street: string = '';
+  city: string = '';
+  postalCode: string = '';
+  errorMessage: string = '';
 
   constructor(private userService: UserService, private router: Router) {}
 
   register(): void {
-    if (!this.name || !this.email || !this.password || !this.address) {
+    if (!this.name || !this.email || !this.password || !this.street || !this.city || !this.postalCode) {
       this.errorMessage = 'Bitte füllen Sie alle Felder aus.';
       return;
     }
@@ -32,7 +34,9 @@ export class RegisterComponent {
       name: this.name,
       email: this.email,
       password: this.password,
-      address: this.address,
+      street: this.street,
+      city: this.city,
+      postalCode: this.postalCode
     };
 
     this.userService.register(newUser).subscribe(

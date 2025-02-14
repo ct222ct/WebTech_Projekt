@@ -13,11 +13,22 @@
       Passwort:
       <input [(ngModel)]="password" name="password" type="password" required />
     </label>
+
     <label>
-      Adresse:
-      <input [(ngModel)]="address" name="address" required />
+      Straße:
+      <input [(ngModel)]="street" name="street" required />
     </label>
+    <label>
+      Stadt:
+      <input [(ngModel)]="city" name="city" required />
+    </label>
+    <label>
+      PLZ:
+      <input [(ngModel)]="postalCode" name="postalCode" required />
+    </label>
+
     <button type="submit">Registrieren</button>
   </form>
+
   <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
 </div>

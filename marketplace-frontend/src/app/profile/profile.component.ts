@@ -16,7 +16,9 @@ export class ProfileComponent implements OnInit {
   user = {
     name: '',
     email: '',
-    address: '',
+    street: '',
+    city: '',
+    postalCode: '',
     password: '',
     confirmPassword: ''
   };
@@ -34,7 +36,9 @@ export class ProfileComponent implements OnInit {
       (data) => {
         this.user.name = data.name;
         this.user.email = data.email;
-        this.user.address = data.address;
+        this.user.street = data.street;
+        this.user.city = data.city;
+        this.user.postalCode = data.postalCode;
       },
       (error) => {
         console.error('Fehler beim Laden der Benutzerdaten:', error);
@@ -60,8 +64,10 @@ export class ProfileComponent implements OnInit {
     const updatedData = {
       name: this.user.name,
       email: this.user.email,
-      address: this.user.address,
-      password: this.user.password
+      street: this.user.street,
+      city: this.user.city,
+      postalCode: this.user.postalCode,
+      password: this.user.password ? this.user.password : undefined
     };
 
     this.userService.updateUserData(updatedData).subscribe(

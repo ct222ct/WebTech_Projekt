@@ -11,11 +11,11 @@ const JWT_SECRET = '1234'; // Ersetze dies durch eine sicherere Option in der Pr
 
 // Registrierung
 router.post('/register', async (req, res) => {
-    const { email, password, name, address } = req.body;
+    const { email, password, name, street, city, postalCode } = req.body;
 
     // Überprüfe, ob alle erforderlichen Felder vorhanden sind
-    if (!email || !password || !name || !address) {
-        return res.status(400).json({ error: 'Alle Felder (email, password, name, address) sind erforderlich.' });
+    if (!email || !password || !name || !street || !city || !postalCode) {
+        return res.status(400).json({ error: 'Alle Felder (email, password, name, street, city, postalCode) sind erforderlich.' });
     }
 
     try {
@@ -27,9 +27,11 @@ router.post('/register', async (req, res) => {
         // Benutzer erstellen
         const user = await User.create({
             name,
-            address,
             email,
             password,
+            street,
+            city,
+            postalCode
         });
 
         await user.save();
@@ -51,35 +53,44 @@ router.get('/user', async (req, res) => {
             return res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
 
-        res.json({ name: user.name, email: user.email, address: user.address });
+        res.json({
+            name: user.name,
+            email: user.email,
+            street: user.street,
+            city: user.city,
+            postalCode: user.postalCode});
     } catch (error) {
         res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerdaten', error });
     }
 });
 
 // Benutzerprofil aktualisieren
-router.put('/user', async (req, res) => {
+router.put('/update',authMiddleware, async (req, res) => {
     try {
-        const { userId, name, email, address } = req.body;
+        const userId = req.user.id; // Holt Benutzer-ID aus dem Token
+        const { name, email, street, city, postalCode } = req.body;
+
+        console.log('Benutzer-ID:', userId);
 
         const user = await User.findByPk(userId);
-
         if (!user) {
             return res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
 
         user.name = name || user.name;
         user.email = email || user.email;
-        user.address = address || user.address;
+        user.street = street || user.street;
+        user.city = city || user.city;
+        user.postalCode = postalCode || user.postalCode;
 
         await user.save();
-
         res.json({ message: 'Benutzerdaten erfolgreich aktualisiert', user });
     } catch (error) {
-        console.error('Fehler beim Login:', error);
-        res.status(500).json({ message: 'Fehler beim Aktualisieren der Benutzerdaten', error });
+        console.error('Fehler beim Aktualisieren der Benutzerdaten:', error);
+        res.status(500).json({ message: 'Interner Serverfehler' });
     }
 });
+
 
 // Login-Route
 router.post('/login', async (req, res) => {

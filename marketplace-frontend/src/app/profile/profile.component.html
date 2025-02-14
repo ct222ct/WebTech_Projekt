@@ -25,12 +25,32 @@
     </div>
 
     <div>
-      <label for="address">Adresse:</label>
+      <label for="street">Straße:</label>
       <input
         type="text"
-        id="address"
-        [(ngModel)]="user.address"
-        name="address"
+        id="street"
+        [(ngModel)]="user.street"
+        name="street"
+        [disabled]="!isEditMode" />
+    </div>
+
+    <div>
+      <label for="city">Stadt:</label>
+      <input
+        type="text"
+        id="city"
+        [(ngModel)]="user.city"
+        name="city"
+        [disabled]="!isEditMode" />
+    </div>
+
+    <div>
+      <label for="postalCode">PLZ:</label>
+      <input
+        type="text"
+        id="postalCode"
+        [(ngModel)]="user.postalCode"
+        name="postalCode"
         [disabled]="!isEditMode" />
     </div>
 
