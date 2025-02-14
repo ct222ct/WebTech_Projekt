@@ -1,47 +1,86 @@
 .container {
-  max-width: 900px;
+  width: 90%;
   margin: auto;
-  padding: 20px;
 }
 
-label {
-  font-weight: bold;
-  display: block;
-  margin-top: 10px;
-}
-
-select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-}
-
-.vehicle-list {
+.filters {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
-.vehicle-item {
+.filter-container {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  border: 1px solid #ddd;
-  padding: 10px;
+  width: 100%;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+}
+
+.search-button-container {
+  margin-left: auto;
+}
+
+.search-button-container button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
   border-radius: 5px;
 }
 
-.thumbnail {
-  width: 80px;
-  height: 60px;
-  object-fit: cover;
-  margin-right: 15px;
+.search-button-container button:hover {
+  background-color: #0056b3;
 }
 
-.details h3 {
-  margin: 0;
-  font-size: 18px;
+.filter-toggle {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-.details p {
-  margin: 3px 0;
+.filter-toggle:hover {
+  text-decoration: underline;
+}
+
+.advanced-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.advanced-filters label {
+  width: 100%;
+}
+
+.advanced-filters input {
+  padding: 5px;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.vehicle-card {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+  background-color: #f9f9f9;
+}
+
+.vehicle-image {
+  width: 100px;
+  height: auto;
+  border-radius: 5px;
 }

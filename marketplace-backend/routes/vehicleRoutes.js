@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Vehicle, Model, Type, Mark, Category } = require('../models'); // Ensure Category is imported
 const { getVehiclesByType, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
-const { getSellerListings , markAsSold} = require('../controllers/vehicleController');
+const { getSellerListings , markAsSold, getSearchListings} = require('../controllers/vehicleController');
 const upload = require('../middlewares/multer');
 const authMiddleware = require('../middlewares/auth');
 
@@ -59,6 +59,8 @@ router.get('/', getVehiclesByType, authMiddleware);
 // Route to get seller's vehicle listings
 router.get('/seller/listings', authMiddleware, getSellerListings);
 
+// Route to get search mark listings
+router.get('/searchMark/listings',getSearchListings );
 
 // Route to mark a vehicle as sold
 router.put('/mark-sold/:vehicleId', authMiddleware, markAsSold);
@@ -116,6 +118,37 @@ router.get('/all-vehicle/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching vehicle:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/marks', async (req, res) => {
+  try {
+    const marks = await Mark.findAll();
+    res.json(marks);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Marken:', error);
+    res.status(500).json({ error: 'Serverfehler beim Abrufen der Marken' });
+  }
+});
+
+router.get('/search', async (req, res) => {
+  try {
+    const { markId } = req.query;
+    console.log(req.query);
+    let whereCondition = {};
+
+    if (markId) whereCondition.markId = markId;
+
+    const vehicles = await Vehicle.findAll({ where: whereCondition });
+
+    if (vehicles.length === 0) {
+      return res.status(404).json({ message: 'Keine Fahrzeuge gefunden.' });
+    }
+
+    res.json(vehicles);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+    res.status(500).json({ message: 'Interner Serverfehler' });
   }
 });
 

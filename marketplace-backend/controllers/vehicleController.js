@@ -1,6 +1,7 @@
 const { Vehicle } = require('../models'); // Importieren des Modells
 const { VehiclePicture } = require('../models'); // Importieren des Modells
 const { User } = require('../models/user');
+const {Model, Op} = require("sequelize");
 
 
 const getVehiclesByType = async (req, res) => {
@@ -206,7 +207,41 @@ const markAsSold = async (req, res) => {
     }
 };
 
+const getSearchListings = async (req, res) => {
+    try {
+        console.log('🔍 Suchanfrage:', req.query);
+        console.log('Abruf der Fahrzeuge für Marke:', req.query.markId);
+        console.log('Abruf der Fahrzeuge für Model:', req.query.modelId);
+        console.log('Abruf der Fahrzeuge für Type:', req.query.typeId);
+
+        let whereCondition = {};
+        whereCondition.sold = false;
+        if (req.query.markId) whereCondition.markId = req.query.markId;
+        if (req.query.modelId) whereCondition.modelId = req.query.modelId;
+        if (req.query.typeId) whereCondition.typeId = req.query.typeId;
+        if (req.query.priceMin && req.query.priceMax) whereCondition.price = { [Op.between]: [req.query.priceMin, req.query.priceMax] };
+        if (req.query.mileageMin && req.query.mileageMax) whereCondition.mileage = { [Op.between]: [req.query.mileageMin, req.query.mileageMax] };
+        if (req.query.city) whereCondition.city = req.query.city;
+        if (req.query.fuelType) whereCondition.fuelType = req.query.fuelType;
+        if (req.query.color) whereCondition.color = req.query.color;
+        if (req.query.condition) whereCondition.condition = req.query.condition;
+
+        const vehicles = await Vehicle.findAll({ where: whereCondition });
+
+
+        if (!vehicles.length) {
+            console.log('Keine Fahrzeuge gefunden.');
+            return res.json([]);
+        }
+
+        console.log('Gefundene Fahrzeuge:', vehicles);
+        res.json(vehicles);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+        res.status(500).json({message: 'Serverfehler'});
+    }
+};
 
 
 
-module.exports = { getVehiclesByType, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold }; // Exportieren der Funktionen
+module.exports = { getSearchListings,getVehiclesByType, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold }; // Exportieren der Funktionen

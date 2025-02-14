@@ -71,7 +71,7 @@ const typeRoutes = require('./routes/typeRoutes');
 app.use('/api/types', typeRoutes);
 const markRoutes = require('./routes/markRoutes');
 app.use('/api/marks', markRoutes);
-
+//app.use('/search', vehicleRoutes);
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

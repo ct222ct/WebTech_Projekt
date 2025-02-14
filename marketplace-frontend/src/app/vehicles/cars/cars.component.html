@@ -47,7 +47,11 @@
             <input type="text" [(ngModel)]="fuelType" placeholder="Benzin, Diesel, etc.">
         </div>
 
-        <button (click)="searchVehicles()">Suchen</button>
+        <div class="button-container">
+            <button (click)="searchVehicles()">Suchen</button>
+            <button (click)="resetFilters()">Filter zurücksetzen</button>
+        </div>
+
     </div>
 
     <div *ngIf="isLoading">Lade Fahrzeuge...</div>
@@ -58,7 +62,8 @@
         <div class="vehicle-details">
             <h3>{{ vehicle.name }}</h3>
             <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
-            <button (click)="viewDetails(vehicle.id)">Details anzeigen</button>
+            <button [routerLink]="['/vehicle-details', vehicle.id]">Details anzeigen</button>
+
         </div>
 
     </div>
