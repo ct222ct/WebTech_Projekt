@@ -1,36 +1,65 @@
 <div class="container">
-  <h2>Auto</h2>
+  <h2>Autos</h2>
 
-  <!-- Marken-Filter -->
-  <label for="mark">Select Marke:</label>
-  <select id="mark" [(ngModel)]="selectedMark" (change)="loadModels()">
-    <option value="" disabled selected>Choose a Marke</option>
-    <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
-  </select>
+  <!-- Filter -->
+  <div class="filters">
+    <label>Marke:</label>
+    <select [(ngModel)]="selectedMarke" (change)="loadModels()">
+      <option value="">Alle Marken</option>
+      <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+    </select>
 
-  <!-- Modell-Filter -->
-  <label for="model">Select Model:</label>
-  <select id="model" [(ngModel)]="selectedModel" [disabled]="!selectedMark">
-    <option value="" selected>Choose a model</option>
-    <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
-  </select>
+    <label>Modell:</label>
+    <select [(ngModel)]="selectedModel" [disabled]="!selectedMarke">
+      <option value="">Alle Modelle</option>
+      <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
+    </select>
 
-  <!-- Such-Button -->
-  <button (click)="searchVehicles()" [disabled]="!selectedMark">🔍 Suche</button>
+    <label>Fahrzeugtyp:</label>
+    <select [(ngModel)]="selectedVehicleType">
+      <option value="">Alle Typen</option>
+      <option *ngFor="let type of vehicleTypes" [value]="type.id">{{ type.name }}</option>
+    </select>
 
-  <!-- Ladespinner -->
-  <div *ngIf="isLoading">Daten werden geladen...</div>
+    <button (click)="toggleFilters()">
+      {{ showAdvancedFilters ? 'Filter ausblenden' : 'Filter erweitern' }}
+    </button>
 
-  <!-- Fahrzeugliste -->
-  <div *ngIf="!isLoading">
-    <div *ngFor="let vehicle of vehicles" class="vehicle-item">
-      <img *ngIf="vehicle.image" [src]="vehicle.image" alt="Vehicle Image" class="vehicle-img" />
-      <div class="vehicle-info">
-        <h3>{{ vehicle.name }}</h3>
-        <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
-        <p><strong>Mileage:</strong> {{ vehicle.mileage }} km</p>
-        <p><strong>First Registration:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
-      </div>
+    <div *ngIf="showAdvancedFilters" class="advanced-filters">
+      <label>Preis (€):</label>
+      <input type="number" [(ngModel)]="priceMin" placeholder="Min.">
+      <input type="number" [(ngModel)]="priceMax" placeholder="Max.">
+
+      <label>Stadt:</label>
+      <input type="text" [(ngModel)]="sellerCity" placeholder="Geben Sie eine Stadt ein">
+
+      <label>Kilometerstand:</label>
+      <input type="number" [(ngModel)]="mileageMin" placeholder="Min. km">
+      <input type="number" [(ngModel)]="mileageMax" placeholder="Max. km">
+
+      <label>color:</label>
+      <input type="text" [(ngModel)]="color" placeholder="Rot, Blau, etc.">
+
+      <label>condition:</label>
+      <input type="text" [(ngModel)]="condition" placeholder="Neu, Gebraucht, etc.">
+
+      <label>type of fuel, :</label>
+      <input type="text" [(ngModel)]="fuelType" placeholder="Benzin, Diesel, etc.">
     </div>
+
+    <button (click)="searchVehicles()">Suchen</button>
+  </div>
+
+  <div *ngIf="isLoading">Lade Fahrzeuge...</div>
+  <div *ngIf="!isLoading && vehicles.length === 0">Keine Fahrzeuge gefunden.</div>
+
+  <div *ngFor="let vehicle of vehicles" class="vehicle-card">
+    <img [ngSrc]="vehicle.imageUrl || 'placeholder.jpg'" width="150" height="100" alt="Vehicle Image">
+    <div class="vehicle-details">
+      <h3>{{ vehicle.name }}</h3>
+      <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+      <button (click)="viewDetails(vehicle.id)">Details anzeigen</button>
+    </div>
+
   </div>
 </div>

@@ -165,7 +165,7 @@ export class SellerListingsComponent implements OnInit {
   updateVehicle(): void {
     const token = localStorage.getItem('token'); // Token aus LocalStorage abrufen
     if (!token) {
-      console.error('❌ Kein Token gefunden!');
+      console.error('Kein Token gefunden!');
       return;
     }
 

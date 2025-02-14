@@ -47,7 +47,7 @@ router.get('/models/:id', async (req, res) => {
 // Fahrzeuge nach Typ abrufen
 router.get('/types/:id', async (req, res) => {
   try {
-    const vehicles = await Vehicle.findAll({ where: { typeId: req.params.id } });
+    const vehicles = await Vehicle.findAll({ where: { typeId: req.params.id, sold: false, } });
     res.json(vehicles);
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Abrufen der Fahrzeuge', error });
@@ -74,51 +74,11 @@ router.get('/models', async (req, res) => {
   }
 });
 
-// Alle Fahrzeugtypen abrufen
-router.get('/types', async (req, res) => {
-  try {
-    const types = await Type.findAll();
-    res.json(types);
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Typen:', error);
-    res.status(500).json({ error: 'Serverfehler beim Abrufen der Typen' });
-  }
-});
-
-router.get('/browse', async (req, res) => {
-  try {
-    const { categoryId, markId, modelId } = req.query;
-
-    let filters = {};
-    if (categoryId) filters.categoryId = categoryId;
-    if (markId) filters.markId = markId;
-    if (modelId) filters.modelId = modelId;
-
-    const vehicles = await Vehicle.findAll({
-      where: filters,
-      include: [
-        { model: Model, attributes: ['name'] },
-        { model: Mark, attributes: ['name'] },
-      ],
-      attributes: ['id', 'name', 'price', 'mileage', 'dateOfFirstRegistration'],
-    });
-
-    res.json(vehicles);
-  } catch (error) {
-    console.error('❌ Error fetching vehicles:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
-
 router.post('/', authMiddleware, addVehicle); // Add a vehicle
 router.put('/:id', authMiddleware, updateVehicle); // Update a vehicle
 router.delete('/:id', authMiddleware, deleteVehicle);
 
-router.get('/categories/:categoryId/marks', async (req, res) => {
-  const { categoryId } = req.params;
-  const marks = await Mark.findAll({ where: { categoryId } });
-  res.json(marks);
-});
+
 
 router.get('/marks/:markId/models', async (req, res) => {
   const { markId } = req.params;
@@ -130,6 +90,33 @@ router.get('/models/:modelId/vehicles', async (req, res) => {
   const { modelId } = req.params;
   const vehicles = await Vehicle.findAll({ where: { modelId } });
   res.json(vehicles);
+});
+
+// Fahrzeug-Details abrufen
+router.get('/vehicle-details/:id', async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findByPk(req.params.id);
+    if (!vehicle) return res.status(404).json({ message: 'Fahrzeug nicht gefunden' });
+
+    res.json(vehicle);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Fahrzeugdetails:', error);
+    res.status(500).json({ error: 'Fehler beim Abrufen der Fahrzeugdetails' });
+  }
+});
+
+router.get('/all-vehicle/:id', async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findByPk(req.params.id);
+
+    if (!vehicle) {
+      return res.status(404).json({ message: 'Vehicle not found' });
+    }
+    res.json(vehicle);
+  } catch (error) {
+    console.error('Error fetching vehicle:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;

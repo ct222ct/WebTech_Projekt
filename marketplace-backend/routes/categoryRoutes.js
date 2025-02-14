@@ -33,7 +33,25 @@ router.get('/:id/marks', async (req, res) => {
     }
 });
 
+// Marken einer Kategorie abrufen (nur für Autos - Kategorie ID 1)
+router.get('/1/marks', async (req, res) => {
+    try {
+        const marks = await Mark.findAll({ where: { categoryId: 1 } }); // Nur Marken für Autos abrufen
+        res.json(marks);
+    } catch (error) {
+        res.status(500).json({ message: 'Fehler beim Abrufen der Marken', error });
+    }
+});
 
+// Marken einer Kategorie abrufen (nur für Motorräder - Kategorie ID 2)
+router.get('/2/marks', async (req, res) => {
+    try {
+        const marks = await Mark.findAll({ where: { categoryId: 2 } }); // Nur Marken für Autos abrufen
+        res.json(marks);
+    } catch (error) {
+        res.status(500).json({ message: 'Fehler beim Abrufen der Marken', error });
+    }
+});
 
 // Route: Kategorie mit Details abrufen
 router.get('/:id', categoryController.getCategoryDetails);

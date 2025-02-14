@@ -1,0 +1,19 @@
+<div class="vehicle-details-container">
+  <h2>Fahrzeugdetails</h2>
+
+  <div *ngIf="isLoading">Lade Fahrzeugdetails...</div>
+  <div *ngIf="!isLoading && vehicle">
+    <img ngSrc="vehicle.imageUrl || 'placeholder.jpg'" width="300" height="200" alt="Vehicle Image">
+    <h3>{{ vehicle.name }}</h3>
+    <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
+    <p><strong>Kilometerstand:</strong> {{ vehicle.mileage }} km</p>
+    <p><strong>Erstzulassung:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
+    <p><strong>Farbe:</strong> {{ vehicle.color }}</p>
+    <p><strong>Kraftstoffart:</strong> {{ vehicle.fuelType }}</p>
+    <p><strong>Zustand:</strong> {{ vehicle.condition }}</p>
+    <p><strong>Beschreibung:</strong> {{ vehicle.description }}</p>
+  </div>
+
+  <button (click)="goBack()" class="back-btn">← Zurück zur Fahrzeugliste</button>
+
+</div>

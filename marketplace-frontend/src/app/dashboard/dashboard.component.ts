@@ -7,9 +7,7 @@ import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.less'],
   imports: [
-    NgForOf,
-    NgIf,
-    NgOptimizedImage
+    NgForOf
   ]
 })
 export class DashboardComponent implements OnInit {

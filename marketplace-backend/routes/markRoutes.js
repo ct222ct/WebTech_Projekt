@@ -14,4 +14,14 @@ router.get('/marks', async (req, res) => {
     }
 });
 
+router.get('/:categoryId', async (req, res) => {
+    try {
+        const marks = await Mark.findAll({where: {categoryId: req.params.categoryId}});
+        res.json(marks);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Marken:', error);
+        res.status(500).json({error: 'Serverfehler beim Abrufen der Modelle'});
+    }
+});
+
 module.exports = router;

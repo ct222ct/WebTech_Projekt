@@ -54,11 +54,14 @@ app.post('/api/users/register', async (req, res) => {
         res.status(500).json({ message: 'Fehler beim Speichern der Registrierung.' });
     }
 });
+
+/*
 app.get('/api/categories/:categoryId/marks', async (req, res) => {
     const categoryId = req.params.categoryId;
     const marks = await Mark.findAll({ where: { categoryId } });
     res.json(marks);
 });
+ */
 
 
 app.use('/api/categories', categoryRoutes); // Endpunkt registrieren
@@ -66,8 +69,8 @@ const modelRoutes = require('./routes/modelRoutes');
 app.use('/api/models', modelRoutes);
 const typeRoutes = require('./routes/typeRoutes');
 app.use('/api/types', typeRoutes);
-const modelRoutes = require('./routes/modelRoutes');
-app.use('/api/models', modelRoutes);
+const markRoutes = require('./routes/markRoutes');
+app.use('/api/marks', markRoutes);
 
 
 // Serve static files from the uploads directory
@@ -76,8 +79,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
-const markRoutes = require('./routes/markRoutes');
-app.use('/api', markRoutes);
+
 
 
 
