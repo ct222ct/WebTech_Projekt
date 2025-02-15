@@ -1,40 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Vehicle, Model, Type, Mark, Category, VehiclePictures } = require('../models'); // Ensure Category is imported
-const { getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
+const { getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle, getVehicleImages}= require('../controllers/vehicleController');
 const { getSellerListings , markAsSold, getSearchListings} = require('../controllers/vehicleController');
 const upload = require('../middlewares/multer');
 const authMiddleware = require('../middlewares/auth');
-
-/*
-// Endpunkt: Alle Fahrzeuge einer Kategorie abrufen
-router.get('/:category', async (req, res) => {
-  try {
-    const categoryName = req.params.category;
-
-    // Kategorie finden
-    const category = await Category.findOne({ where: { name: categoryName } });
-    if (!category) {
-      return res.status(404).json({ message: `Kategorie '${categoryName}' nicht gefunden` });
-    }
-
-    // Fahrzeuge dieser Kategorie abrufen
-    const vehicles = await Vehicle.findAll({
-      where: { categoryId: category.id },
-      include: [
-        { model: Mark, as: 'mark', attributes: ['name'] },
-        { model: Model, as: 'model', attributes: ['name'] },
-      ],
-    });
-
-    res.json(vehicles);
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Fahrzeuge:', error);
-    res.status(500).json({ message: 'Serverfehler', error });
-  }
-});
-
- */
 
 // Fahrzeuge nach Modell abrufen
 router.get('/models/:id', async (req, res) => {
@@ -156,10 +126,6 @@ router.get('/search', async (req, res) => {
   }
 });
 
-router.get('/vehicle/:id/images', async (req, res) => {
-  const { id } = req.params;
-  const images = await VehiclePictures.findAll({ where: { vehicleId: id } });
-  res.json(images);
-});
-
+// Route für das Abrufen von Fahrzeugbildern
+router.get('/images/:vehicleId', getVehicleImages);
 module.exports = router;

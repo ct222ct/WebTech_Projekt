@@ -66,11 +66,6 @@ const addVehicle = async (req, res) => {
     }
 };
 
-
-
-
-
-
 const updateVehicle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -131,7 +126,6 @@ const updateVehicle = async (req, res) => {
     }
 };
 
-
 const deleteVehicle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -164,13 +158,13 @@ const deleteVehicle = async (req, res) => {
     }
 };
 
-
 const getSellerListings = async (req, res) => {
     try {
         console.log('Abruf der Fahrzeuge für Benutzer-ID:', req.user.id);
 
         const vehicles = await Vehicle.findAll({
             where: { userId: req.user.id },
+            include: [{ model: VehiclePictures, as: 'pictures' }]  // Bilder einbinden
         });
 
         if (!vehicles.length) {
@@ -246,6 +240,42 @@ const getSearchListings = async (req, res) => {
     }
 };
 
+const getVehicleImages = async (req, res) => {
+    try {
+        const { vehicleId } = req.params;
+        const images = await VehiclePictures.findAll({
+            where: { vehicleId },
+            attributes: ['url']
+        });
+
+        if (!images.length) {
+            return res.status(404).json({ message: 'Keine Bilder gefunden' });
+        }
+
+        // Absolute URLs generieren
+        const baseUrl = "http://localhost:3000"; // Falls dein Backend auf einer anderen URL läuft, passe das an
+        const formattedImages = images.map(img => ({
+            url: `${baseUrl}${img.url}`
+        }));
+
+        res.json(formattedImages);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Bilder:', error);
+        res.status(500).json({ error: 'Fehler beim Abrufen der Bilder' });
+    }
+};
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');  // Stelle sicher, dass dies das korrekte Verzeichnis ist!
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
 
 
-module.exports = { getSearchListings, getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold }; // Exportieren der Funktionen
+module.exports = { upload,getVehicleImages, getSearchListings, getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold }; // Exportieren der Funktionen

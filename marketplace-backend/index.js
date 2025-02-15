@@ -22,6 +22,10 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage });
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // .env-Konfiguration laden
 dotenv.config();
 // CORS-Middleware aktivieren
@@ -73,9 +77,7 @@ const markRoutes = require('./routes/markRoutes');
 app.use('/api/marks', markRoutes);
 //app.use('/search', vehicleRoutes);
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // Datenbank synchronisieren
 (async () => {
     try {

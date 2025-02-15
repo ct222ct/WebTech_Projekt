@@ -73,16 +73,28 @@ export class SellerListingsComponent implements OnInit {
   }
 
   fetchSellerListings(): void {
-    const token = localStorage.getItem('token'); // Token abrufen
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.get<any[]>('http://localhost:3000/api/vehicles/seller/listings', { headers }).subscribe({
       next: (data) => {
         console.log('Empfangene Fahrzeugdaten:', data);
         this.vehicles = data;
+
+        // Lade Bilder für jedes Fahrzeug
+        this.vehicles.forEach(vehicle => {
+          this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+            .subscribe({
+              next: (images) => {
+                vehicle.pictures = images; // Setzt das Bild-Array für das Fahrzeug
+              },
+              error: (error) => {
+                console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+                vehicle.pictures = []; // Falls kein Bild gefunden wurde, leer setzen
+              }
+            });
+        });
+
         this.isLoading = false;
       },
       error: (err) => {

@@ -15,17 +15,17 @@
   <div *ngIf="!isLoading && vehicles.length > 0" class="listings">
     <div *ngFor="let vehicles of vehicles" class="listing-card">
       <h3>{{ vehicles.name }}</h3>
-      <p>{{ vehicles.description }}</p>
+      <p><strong>Beschreibung:</strong> {{ vehicles.description }}</p>
       <p><strong>Preis:</strong> {{ vehicles.price }} €</p>
+      <div *ngIf="vehicles.pictures?.length">
+        <img *ngFor="let image of vehicles.pictures" [src]="image.url" width="150" height="100" alt="Fahrzeugbild">
+      </div>
+      <div *ngIf="!vehicles.pictures?.length">
+        <img src="assets/placeholder.jpg" width="150" height="100" alt="Kein Bild verfügbar">
+      </div>
+
       <p *ngIf="vehicles.sold" class="sold-badge"> Sold</p>
       <button *ngIf="!vehicles.sold" (click)="markAsSold(vehicles.id)">Mark as Sold</button>
-      <div class="pictures">
-
-      <div *ngIf="vehicles.images?.length">
-        <img *ngFor="let image of vehicles.images" ngSrc="'http://localhost:3000/' + image.imageUrl" alt="Fahrzeugbild">
-      </div>
-
-      </div>
       <button (click)="deleteVehicle(vehicles.id)" class="delete-btn">Delete</button>
       <button (click)="openEditModal(vehicles)">Update</button>
 
