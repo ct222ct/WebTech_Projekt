@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { UserService } from '../services/user.service';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
 import {FormsModule} from '@angular/forms'; // Import UserService
 
 @Component({
@@ -11,7 +11,8 @@ import {FormsModule} from '@angular/forms'; // Import UserService
   imports: [
     NgIf,
     NgForOf,
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ]
 })
 export class SellerListingsComponent implements OnInit {
@@ -45,6 +46,8 @@ export class SellerListingsComponent implements OnInit {
     condition: '',
     images: []
   };
+  selectedImages: File[] = [];
+
   editedVehicle: any = {}; // Hier werden die vorhandenen Fahrzeugdaten gespeichert
   isEditModalOpen: boolean = false; // Steuert die Sichtbarkeit des Bearbeitungsmodals
 
@@ -170,37 +173,49 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
-
-
-
   addVehicle(): void {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('Kein Token gefunden! Benutzer ist nicht eingeloggt.');
+      console.error('Kein Token gefunden!');
       return;
     }
+    this.newVehicle.categoryId = this.selectedCategory;
+    //this.newVehicle.userId = this.user.id;
+    this.newVehicle.markId = this.selectedMarkId;
 
-    this.userService.getUserData().subscribe(user => {
-      console.log('Benutzer-ID erhalten:', user.id);
+    const formData = new FormData();
+    formData.append('name', this.newVehicle.name);
+    formData.append('modelId', this.newVehicle.modelId);
+    formData.append('typeId', this.newVehicle.typeId);
+    formData.append('markId', this.newVehicle.markId);
+    formData.append('categoryId', this.newVehicle.categoryId);
+    formData.append('description', this.newVehicle.description);
+    formData.append('price', this.newVehicle.price.toString());
+    formData.append('dateOfFirstRegistration', this.newVehicle.dateOfFirstRegistration);
+    formData.append('mileage', this.newVehicle.mileage.toString());
+    formData.append('fuelType', this.newVehicle.fuelType);
+    formData.append('color', this.newVehicle.color);
+    formData.append('condition', this.newVehicle.condition);
 
-      this.newVehicle.userId = user.id; // Benutzer-ID setzen
-      this.newVehicle.categoryId = this.selectedCategory; // Kategorie-ID setzen
-      this.newVehicle.markId = this.selectedMarkId; // Marke-ID setzen
-
-      this.http.post('http://localhost:3000/api/vehicles', this.newVehicle, {
-        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
-      }).subscribe({
-        next: (vehicle) => {
-          console.log('Fahrzeug erfolgreich hinzugefügt:', vehicle);
-          this.vehicles.push(vehicle);
-          this.newVehicle = {}; // Reset form
-          this.closeModal();
-        },
-        error: (error) => {
-          console.error('Fehler beim Hinzufügen des Fahrzeugs:', error);
-        }
-      });
+    this.selectedImages.forEach((file, index) => {
+      formData.append(`images`, file);
     });
+
+    this.http.post('http://localhost:3000/api/vehicles', formData, {
+      headers: new HttpHeaders({Authorization: `Bearer ${token}`})
+    }).subscribe({
+      next: (response) => {
+        console.log('Fahrzeug erfolgreich hinzugefügt:', response);
+        this.selectedImages = [];
+      },
+      error: (error) => {
+        console.error('Fehler beim Hinzufügen des Fahrzeugs:', error);
+      }
+    });
+  }
+
+  onFileSelected(event: any): void {
+    this.selectedImages = Array.from(event.target.files);
   }
 
   openEditModal(vehicle: any): void {
@@ -233,7 +248,6 @@ export class SellerListingsComponent implements OnInit {
         }
       });
   }
-
 
   deleteVehicle(vehicleId: number): void {
     const token = localStorage.getItem('token'); // 🔹 Token abrufen

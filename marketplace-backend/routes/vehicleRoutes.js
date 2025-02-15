@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Vehicle, Model, Type, Mark, Category } = require('../models'); // Ensure Category is imported
+const { Vehicle, Model, Type, Mark, Category, VehiclePictures } = require('../models'); // Ensure Category is imported
 const { getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
 const { getSellerListings , markAsSold, getSearchListings} = require('../controllers/vehicleController');
 const upload = require('../middlewares/multer');
@@ -79,7 +79,8 @@ router.get('/models', async (req, res) => {
   }
 });
 
-router.post('/', authMiddleware, addVehicle); // Add a vehicle
+// Fahrzeug mit Bildern speichern
+router.post('/', authMiddleware, upload.array('images', 5), addVehicle);
 router.put('/:id', authMiddleware, updateVehicle); // Update a vehicle
 router.delete('/:id', authMiddleware, deleteVehicle);
 
@@ -153,6 +154,12 @@ router.get('/search', async (req, res) => {
     console.error('Fehler beim Abrufen der Fahrzeuge:', error);
     res.status(500).json({ message: 'Interner Serverfehler' });
   }
+});
+
+router.get('/vehicle/:id/images', async (req, res) => {
+  const { id } = req.params;
+  const images = await VehiclePictures.findAll({ where: { vehicleId: id } });
+  res.json(images);
 });
 
 module.exports = router;

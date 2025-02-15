@@ -16,7 +16,7 @@ fs.readdirSync(__dirname)
 // Initialisiere Assoziationen
 Object.keys(db).forEach((modelName) => {
     if (db[modelName].associate) {
-        console.log(`Initialisiere Assoziation für ${modelName}`); // Debugging
+       // console.log(`Initialisiere Assoziation für ${modelName}`); // Debugging
         db[modelName].associate(db);
     }
 });

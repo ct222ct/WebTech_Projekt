@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const VehiclePicture = sequelize.define('VehiclePicture', {
+    const VehiclePictures = sequelize.define('VehiclePictures', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -20,9 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     // Associations
-    VehiclePicture.associate = (models) => {
-        VehiclePicture.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicle' });
+    VehiclePictures.associate = (models) => {
+        VehiclePictures.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicle' });
     };
 
-    return VehiclePicture;
+    return VehiclePictures;
 };

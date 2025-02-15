@@ -55,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
         Vehicle.belongsTo(models.Model, { foreignKey: 'modelId', as: 'model' });
         Vehicle.belongsTo(models.Type, { foreignKey: 'typeId', as: 'type' });
         Vehicle.belongsTo(models.Category, { foreignKey: 'categoryId', as: 'category' });
-        Vehicle.hasMany(models.VehiclePicture, { foreignKey: 'vehicleId', as: 'pictures' });
+        Vehicle.hasMany(models.VehiclePictures, { foreignKey: 'vehicleId', as: 'pictures' });
     };
 
     return Vehicle;

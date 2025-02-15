@@ -1,6 +1,7 @@
-const { Vehicle } = require('../models'); // Importieren des Modells
+const { Vehicle, VehiclePictures } = require('../models'); // Importieren des Modells
 const { Op } = require('sequelize');
-
+const path = require('path');
+const fs = require('fs');
 
 const getVehiclesByCategory = async (req, res) => {
     try {
@@ -29,39 +30,42 @@ const getVehiclesByCategory = async (req, res) => {
 
 const addVehicle = async (req, res) => {
     try {
-        const { name, modelId, typeId, markId, categoryId, description, price, dateOfFirstRegistration, mileage, fuelType, color, condition } = req.body;
+        const {
+            name, modelId, typeId, markId, categoryId,
+            description, price, dateOfFirstRegistration, mileage,
+            fuelType, color, condition
+        } = req.body;
 
-        // Benutzer-ID aus Token holen
         const userId = req.user.id;
         if (!userId) {
             return res.status(401).json({ message: 'Unauthorized: Benutzer-ID fehlt' });
         }
 
         console.log('Fahrzeugdaten:', req.body);
-        console.log('Benutzer-ID:', userId);
 
+        // 🚗 Fahrzeug in DB speichern
         const vehicle = await Vehicle.create({
-            name,
-            modelId,
-            typeId,
-            markId,
-            categoryId,
-            description,
-            price,
-            dateOfFirstRegistration,
-            mileage,
-            fuelType,
-            color,
-            condition,
-            userId, // Benutzer-ID setzen
+            name, modelId, typeId, markId, categoryId,
+            description, price, dateOfFirstRegistration, mileage,
+            fuelType, color, condition, userId
         });
 
-        res.status(201).json(vehicle);
+        // 📸 Bilder speichern
+        if (req.files && req.files.length > 0) {
+            const imageRecords = req.files.map(file => ({
+                vehicleId: vehicle.id,
+                url: `/uploads/${file.filename}`
+            }));
+            await VehiclePictures.bulkCreate(imageRecords);
+        }
+
+        res.status(201).json({ message: 'Fahrzeug hinzugefügt!', vehicle });
     } catch (error) {
         console.error('Fehler beim Speichern des Fahrzeugs:', error);
         res.status(500).json({ message: 'Fehler beim Speichern des Fahrzeugs.' });
     }
 };
+
 
 
 

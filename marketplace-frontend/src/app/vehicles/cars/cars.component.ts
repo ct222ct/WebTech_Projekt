@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgForOf, NgIf, NgOptimizedImage } from "@angular/common";
-import {Router, RouterLink} from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-cars',
@@ -33,8 +33,6 @@ export class CarsComponent implements OnInit {
   isLoading: boolean = false;
   showAdvancedFilters: boolean = false;
 
-
-
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
@@ -63,13 +61,11 @@ export class CarsComponent implements OnInit {
     });
   }
 
-
   // Lädt nur die Marken der Kategorie Auto (categoryId=1)
   loadMarks(): void {
     this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
       next: (data) => {
         this.marks = data;
-        //console.log('Geladene Marken:', this.marks);
       },
       error: (error) => {
         console.error('Fehler beim Laden der Marken:', error);
@@ -77,9 +73,8 @@ export class CarsComponent implements OnInit {
     });
   }
 
-  //Lädt Modelle basierend auf der ausgewählten Marke
+  // Lädt Modelle basierend auf der ausgewählten Marke
   loadModels(): void {
-    //console.log(this.selectedModel);
     if (!this.selectedMarke) {
       this.models = [];
       return;
@@ -87,7 +82,6 @@ export class CarsComponent implements OnInit {
     this.http.get<any[]>(`http://localhost:3000/api/models/${this.selectedMarke}`).subscribe({
       next: (data) => {
         this.models = data;
-        console.log('Geladene Modelle:', this.models);
       },
       error: (error) => {
         console.error('Fehler beim Laden der Modelle:', error);
@@ -122,18 +116,14 @@ export class CarsComponent implements OnInit {
     if (this.color) queryParams.append('color', this.color);
     if (this.condition) queryParams.append('condition', this.condition);
 
-    // Prüfen, ob KEIN Filter gesetzt wurde -> Alle Fahrzeuge laden
     if (queryParams.toString() === '') {
-      console.log('Keine Filter gesetzt, lade alle Fahrzeuge');
       this.loadAllVehicles();
       return;
     }
 
-    // Falls Filter gesetzt sind, gefilterte Suche durchführen
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/searchMark/listings?${queryParams.toString()}`)
         .subscribe({
           next: (data) => {
-            console.log('Gefilterte Fahrzeuge:', data);
             this.vehicles = data;
             this.isLoading = false;
           },
@@ -143,6 +133,7 @@ export class CarsComponent implements OnInit {
           },
         });
   }
+
   resetFilters(): void {
     this.selectedMarke = '';
     this.selectedModel = '';
@@ -156,12 +147,7 @@ export class CarsComponent implements OnInit {
     this.color = '';
     this.condition = '';
 
-    // Zurückgesetzte Werte sofort übernehmen
-    this.models = []; // Falls Marke zurückgesetzt wurde, auch Modelle leeren
-
-    // Alle Fahrzeuge neu laden
+    this.models = [];
     this.loadAllVehicles();
   }
-
-
 }

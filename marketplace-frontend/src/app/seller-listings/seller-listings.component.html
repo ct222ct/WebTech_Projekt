@@ -20,10 +20,15 @@
       <p *ngIf="vehicles.sold" class="sold-badge"> Sold</p>
       <button *ngIf="!vehicles.sold" (click)="markAsSold(vehicles.id)">Mark as Sold</button>
       <div class="pictures">
-        <img *ngFor="let picture of vehicles.pictures" [src]="picture.url" alt="Vehicle Picture" />
-        <button (click)="deleteVehicle(vehicles.id)" class="delete-btn">Delete</button>
-        <button (click)="openEditModal(vehicles)">Update</button>
+
+      <div *ngIf="vehicles.images?.length">
+        <img *ngFor="let image of vehicles.images" ngSrc="'http://localhost:3000/' + image.imageUrl" alt="Fahrzeugbild">
       </div>
+
+      </div>
+      <button (click)="deleteVehicle(vehicles.id)" class="delete-btn">Delete</button>
+      <button (click)="openEditModal(vehicles)">Update</button>
+
     </div>
   </div>
 
@@ -69,6 +74,10 @@
       <input type="text" placeholder="Condition" [(ngModel)]="newVehicle.condition" />
 
       <div class="modal-buttons">
+        <label>Bilder hochladen:</label>
+        <input type="file" (change)="onFileSelected($event)" multiple accept="image/*">
+
+
         <button (click)="addVehicle()">Save</button>
         <button class="close-btn" (click)="closeModal()">Cancel</button>
       </div>

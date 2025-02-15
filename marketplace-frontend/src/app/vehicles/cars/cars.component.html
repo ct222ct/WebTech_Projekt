@@ -58,7 +58,8 @@
     <div *ngIf="!isLoading && vehicles.length === 0">Keine Fahrzeuge gefunden.</div>
 
     <div *ngFor="let vehicle of vehicles" class="vehicle-card">
-        <img [ngSrc]="vehicle.imageUrl || 'placeholder.jpg'" width="150" height="100" alt="Vehicle Image">
+        <img ngSrc="vehicle.images && vehicle.images.length > 0 ? vehicle.images[0].url : 'assets/placeholder.jpg'"
+             width="150" height="100" alt="Fahrzeugbild">
         <div class="vehicle-details">
             <h3>{{ vehicle.name }}</h3>
             <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
