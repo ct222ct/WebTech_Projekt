@@ -9,7 +9,7 @@ import {Router, RouterLink} from "@angular/router";
   templateUrl: './motorbikes.component.html',
   styleUrls: ['./motorbikes.component.less'],
   standalone: true,
-  imports: [FormsModule, NgForOf, NgIf, NgOptimizedImage, RouterLink],
+  imports: [FormsModule, NgForOf, NgIf, RouterLink],
 })
 
 export class MotorbikesComponent implements OnInit {

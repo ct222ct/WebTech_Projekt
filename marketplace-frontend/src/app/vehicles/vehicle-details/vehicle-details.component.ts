@@ -9,7 +9,6 @@ import { Location } from '@angular/common';
   templateUrl: './vehicle-details.component.html',
   imports: [
     NgIf,
-    NgOptimizedImage,
     NgForOf
   ],
   styleUrls: ['./vehicle-details.component.less']
@@ -17,7 +16,7 @@ import { Location } from '@angular/common';
 export class VehicleDetailsComponent implements OnInit {
   vehicle: any = null;
   isLoading: boolean = true;
-  images: any[] = []; // Speichert Bilder
+  images: string[] = []; // Speichert Bilder
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private location: Location) {}
 
@@ -34,9 +33,8 @@ export class VehicleDetailsComponent implements OnInit {
 
     this.http.get(`http://localhost:3000/api/vehicles/all-vehicle/${vehicleId}`).subscribe({
       next: (data) => {
-        console.log('Empfangene Fahrzeugdaten:', data);
+        console.log('Fahrzeugdaten empfangen:', data);
         this.vehicle = data;
-        console.log('Fahrzeug:', this.vehicle);
         this.isLoading = false;
       },
       error: (error) => {
@@ -47,13 +45,16 @@ export class VehicleDetailsComponent implements OnInit {
   }
 
   loadVehicleImages(vehicleId: string): void {
-    console.log('Lade Fahrzeugbilder für ID:', vehicleId);
+    console.log('Lade Bilder für Fahrzeug ID:', vehicleId);
 
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicleId}`).subscribe({
       next: (images) => {
-        console.log(`Bilder für Fahrzeug ${vehicleId}:`, images);
+        console.log(`Empfangene Bilder für Fahrzeug ${vehicleId}:`, images);
         if (images.length > 0) {
-          this.images = images.map(img => img.url);
+          this.images = images.map(img => img.url.startsWith('/uploads/')
+            ? `http://localhost:3000${img.url}`
+            : img.url
+          );
         }
       },
       error: (error) => {

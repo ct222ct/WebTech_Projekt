@@ -9,7 +9,7 @@ import { Router, RouterLink } from "@angular/router";
   templateUrl: './cars.component.html',
   styleUrls: ['./cars.component.less'],
   standalone: true,
-  imports: [FormsModule, NgForOf, NgIf, NgOptimizedImage, RouterLink],
+  imports: [FormsModule, NgForOf, NgIf, RouterLink],
 })
 export class CarsComponent implements OnInit {
   vehicles: any[] = [];

@@ -1,15 +1,48 @@
+.vehicle-details-container {
+  max-width: 800px;  /* Begrenzte Breite für bessere Lesbarkeit */
+  margin: 30px auto;  /* Zentriert den Container auf der Seite */
+  padding: 20px;
+  border: 1px solid #ddd;  /* Dezente Umrandung */
+  border-radius: 10px;
+  background-color: #f9f9f9; /* Leichter Hintergrund für Kontrast */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Schatten für leichtes 3D-Design */
+}
 
-.back-btn {
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6; /* Mehr Abstand zwischen Zeilen für bessere Lesbarkeit */
+  margin-left: 20px; /* Abstand vom linken Rand */
+}
+
+strong {
+  font-weight: bold;
+}
+
+img {
+  display: block;
+  margin: 10px auto; /* Zentriert Bilder */
+  border-radius: 5px;
+}
+
+button.back-btn {
+  display: block;
+  width: fit-content;
+  margin: 20px auto; /* Zentriert den Button */
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 20px;
+  border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 5px;
-  margin-top: 10px;
+  transition: background-color 0.3s;
 }
 
-.back-btn:hover {
+button.back-btn:hover {
   background-color: #0056b3;
 }

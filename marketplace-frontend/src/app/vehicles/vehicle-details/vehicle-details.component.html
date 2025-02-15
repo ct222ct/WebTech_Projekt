@@ -4,18 +4,21 @@
   <div *ngIf="isLoading">Lade Fahrzeugdetails...</div>
 
   <div *ngIf="!isLoading && vehicle">
-
     <!-- Fahrzeugbilder anzeigen -->
     <div *ngIf="images.length">
-      <img *ngFor="let image of images" [src]="image" width="150" height="100" alt="Fahrzeugbild">
+      <h3>Bilder</h3>
+      <img *ngFor="let image of images" [src]="image" width="200" height="150" alt="Fahrzeugbild">
     </div>
 
     <!-- Falls keine Bilder vorhanden sind, Platzhalter anzeigen -->
     <div *ngIf="!images.length">
-      <img src="assets/placeholder.jpg" width="150" height="100" alt="Kein Bild verfügbar">
+      <h3>Kein Bild verfügbar</h3>
+      <img src="assets/placeholder.jpg" width="200" height="150" alt="Kein Bild verfügbar">
     </div>
 
     <h3>{{ vehicle.name }}</h3>
+    <p><strong>Verkäufer:</strong> {{ vehicle.seller?.name || 'Unbekannt' }}</p>
+    <p><strong>Marke:</strong> {{ vehicle.mark || 'Nicht verfügbar' }}</p>
     <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
     <p><strong>Kilometerstand:</strong> {{ vehicle.mileage }} km</p>
     <p><strong>Erstzulassung:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
@@ -23,7 +26,7 @@
     <p><strong>Kraftstoffart:</strong> {{ vehicle.fuelType }}</p>
     <p><strong>Zustand:</strong> {{ vehicle.condition }}</p>
     <p><strong>Beschreibung:</strong> {{ vehicle.description }}</p>
-  </div>
 
-  <button (click)="goBack()" class="back-btn">← Zurück zur Fahrzeugliste</button>
+    <button (click)="goBack()" class="back-btn">← Zurück zur Fahrzeugliste</button>
+  </div>
 </div>
