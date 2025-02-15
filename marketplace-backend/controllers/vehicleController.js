@@ -264,6 +264,7 @@ const getVehicleImages = async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Abrufen der Bilder' });
     }
 };
+
 const multer = require('multer');
 
 const storage = multer.diskStorage({

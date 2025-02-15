@@ -1,42 +1,63 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import {NgIf, NgOptimizedImage} from '@angular/common';
-import {Location} from '@angular/common';
+import { NgForOf, NgIf, NgOptimizedImage } from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-vehicle-details',
   templateUrl: './vehicle-details.component.html',
   imports: [
     NgIf,
-    NgOptimizedImage
+    NgOptimizedImage,
+    NgForOf
   ],
   styleUrls: ['./vehicle-details.component.less']
 })
 export class VehicleDetailsComponent implements OnInit {
   vehicle: any = null;
   isLoading: boolean = true;
+  images: any[] = []; // Speichert Bilder
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private location: Location) {
-  }
+  constructor(private route: ActivatedRoute, private http: HttpClient, private location: Location) {}
 
   ngOnInit(): void {
-    const vehicleId = this.route.snapshot.paramMap.get('id'); // Get ID from URL
-    this.loadVehicleDetails(vehicleId);
+    const vehicleId = this.route.snapshot.paramMap.get('id'); // Fahrzeug-ID aus URL holen
+    if (vehicleId) {
+      this.loadVehicleDetails(vehicleId);
+      this.loadVehicleImages(vehicleId);
+    }
   }
 
-  loadVehicleDetails(vehicleId: string | null): void {
-    if (!vehicleId) return;
-    console.log('vehicleId:', vehicleId);
+  loadVehicleDetails(vehicleId: string): void {
+    console.log('Lade Fahrzeugdetails für ID:', vehicleId);
+
     this.http.get(`http://localhost:3000/api/vehicles/all-vehicle/${vehicleId}`).subscribe({
       next: (data) => {
-        console.log('data:', data);
+        console.log('Empfangene Fahrzeugdaten:', data);
         this.vehicle = data;
+        console.log('Fahrzeug:', this.vehicle);
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Fehler beim Laden der Fahrzeugdetails:', error);
         this.isLoading = false;
+      },
+    });
+  }
+
+  loadVehicleImages(vehicleId: string): void {
+    console.log('Lade Fahrzeugbilder für ID:', vehicleId);
+
+    this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicleId}`).subscribe({
+      next: (images) => {
+        console.log(`Bilder für Fahrzeug ${vehicleId}:`, images);
+        if (images.length > 0) {
+          this.images = images.map(img => img.url);
+        }
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Fahrzeugbilder:', error);
       },
     });
   }

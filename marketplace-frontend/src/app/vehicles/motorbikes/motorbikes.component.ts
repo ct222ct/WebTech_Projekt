@@ -53,6 +53,20 @@ export class MotorbikesComponent implements OnInit {
       next: (data) => {
         console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
+
+        // 🚀 Lade für jedes Fahrzeug die zugehörigen Bilder
+        this.vehicles.forEach(vehicle => {
+          this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+            .subscribe({
+              next: (images) => {
+                vehicle.pictures = images;
+              },
+              error: (error) => {
+                console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+              }
+            });
+        });
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -61,6 +75,7 @@ export class MotorbikesComponent implements OnInit {
       },
     });
   }
+
 
   // Lädt nur die Marken der Kategorie Motorrad (categoryId=2)
   loadMarks(): void {
@@ -118,23 +133,33 @@ export class MotorbikesComponent implements OnInit {
     if (this.color) queryParams.append('color', this.color);
     if (this.condition) queryParams.append('condition', this.condition);
 
-    // Prüfen, ob KEIN Filter gesetzt wurde -> Alle Fahrzeuge laden
     if (queryParams.toString() === '') {
-      console.log('Keine Filter gesetzt, lade alle Motorräder');
       this.loadAllVehicles();
       return;
     }
 
-    // Falls Filter gesetzt sind, gefilterte Suche durchführen
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/searchMark/listings?${queryParams.toString()}`)
       .subscribe({
         next: (data) => {
-          console.log('Gefilterte Motorräder:', data);
           this.vehicles = data;
+
+          // Lade für jedes Fahrzeug die zugehörigen Bilder
+          this.vehicles.forEach(vehicle => {
+            this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+              .subscribe({
+                next: (images) => {
+                  vehicle.pictures = images;
+                },
+                error: (error) => {
+                  console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+                }
+              });
+          });
+
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Fehler beim Abrufen der Motorräder:', error);
+          console.error('Fehler beim Abrufen der Fahrzeuge:', error);
           this.isLoading = false;
         },
       });
@@ -153,10 +178,7 @@ export class MotorbikesComponent implements OnInit {
     this.color = '';
     this.condition = '';
 
-    // Zurückgesetzte Werte sofort übernehmen
-    this.models = []; // Falls Marke zurückgesetzt wurde, auch Modelle leeren
-
-    // Alle Motorräder neu laden
+    this.models = [];
     this.loadAllVehicles();
   }
 }

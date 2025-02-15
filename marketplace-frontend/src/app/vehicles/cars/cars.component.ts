@@ -52,6 +52,20 @@ export class CarsComponent implements OnInit {
       next: (data) => {
         console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
+
+        // Lade für jedes Fahrzeug die zugehörigen Bilder
+        this.vehicles.forEach(vehicle => {
+          this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+              .subscribe({
+                next: (images) => {
+                  vehicle.pictures = images;
+                },
+                error: (error) => {
+                  console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+                }
+              });
+        });
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -60,6 +74,7 @@ export class CarsComponent implements OnInit {
       },
     });
   }
+
 
   // Lädt nur die Marken der Kategorie Auto (categoryId=1)
   loadMarks(): void {
@@ -125,6 +140,20 @@ export class CarsComponent implements OnInit {
         .subscribe({
           next: (data) => {
             this.vehicles = data;
+
+            // Lade für jedes Fahrzeug die zugehörigen Bilder
+            this.vehicles.forEach(vehicle => {
+              this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+                  .subscribe({
+                    next: (images) => {
+                      vehicle.pictures = images;
+                    },
+                    error: (error) => {
+                      console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+                    }
+                  });
+            });
+
             this.isLoading = false;
           },
           error: (error) => {

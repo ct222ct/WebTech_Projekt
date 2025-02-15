@@ -219,6 +219,7 @@ export class SellerListingsComponent implements OnInit {
       next: (response) => {
         console.log('Fahrzeug erfolgreich hinzugefügt:', response);
         this.selectedImages = [];
+        this.closeModal()
       },
       error: (error) => {
         console.error('Fehler beim Hinzufügen des Fahrzeugs:', error);

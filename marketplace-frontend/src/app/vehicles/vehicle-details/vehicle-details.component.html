@@ -2,8 +2,19 @@
   <h2>Fahrzeugdetails</h2>
 
   <div *ngIf="isLoading">Lade Fahrzeugdetails...</div>
+
   <div *ngIf="!isLoading && vehicle">
-    <img ngSrc="vehicle.imageUrl || 'placeholder.jpg'" width="300" height="200" alt="Vehicle Image">
+
+    <!-- Fahrzeugbilder anzeigen -->
+    <div *ngIf="images.length">
+      <img *ngFor="let image of images" [src]="image" width="150" height="100" alt="Fahrzeugbild">
+    </div>
+
+    <!-- Falls keine Bilder vorhanden sind, Platzhalter anzeigen -->
+    <div *ngIf="!images.length">
+      <img src="assets/placeholder.jpg" width="150" height="100" alt="Kein Bild verfügbar">
+    </div>
+
     <h3>{{ vehicle.name }}</h3>
     <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
     <p><strong>Kilometerstand:</strong> {{ vehicle.mileage }} km</p>
@@ -15,5 +26,4 @@
   </div>
 
   <button (click)="goBack()" class="back-btn">← Zurück zur Fahrzeugliste</button>
-
 </div>
