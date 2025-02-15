@@ -28,24 +28,38 @@
   </div>
 
 
-  <!-- Popup Modal -->
+  <!-- Modal zum Hinzufügen eines Fahrzeugs -->
   <div class="modal" *ngIf="isModalOpen">
     <div class="modal-content">
       <h3>Add New Vehicle</h3>
-      <input type="text" placeholder="Name" [(ngModel)]="newVehicle.name" />
 
-      <!-- Dropdown for Model -->
-      <select [(ngModel)]="newVehicle.modelId">
+      <!-- Kategorie auswählen -->
+      <select [(ngModel)]="selectedCategory" (change)="loadMarks()" (change)="loadTypes()">
+        <option value="" disabled selected>Select Category</option>
+        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+      </select>
+
+
+      <!-- Marke auswählen (abhängig von Kategorie) -->
+      <select [(ngModel)]="selectedMarkId" [disabled]="!selectedCategory" (change)="loadModels()">
+        <option value="" disabled selected>Select Brand</option>
+        <option *ngFor="let mark of marks" [value]="mark.id">{{ mark.name }}</option>
+      </select>
+
+      <!-- Modell auswählen (abhängig von Marke) -->
+      <select [(ngModel)]="newVehicle.modelId" [disabled]="!selectedMarkId">
         <option value="" disabled selected>Select Model</option>
         <option *ngFor="let model of models" [value]="model.id">{{ model.name }}</option>
       </select>
 
-      <!-- Dropdown for Type -->
-      <select [(ngModel)]="newVehicle.typeId">
+      <!-- Typ auswählen (abhängig von Kategorie) -->
+      <select [(ngModel)]="newVehicle.typeId" [disabled]="!selectedCategory">
         <option value="" disabled selected>Select Type</option>
         <option *ngFor="let type of types" [value]="type.id">{{ type.name }}</option>
       </select>
 
+      <!-- Weitere Details -->
+      <input type="text" placeholder="Name" [(ngModel)]="newVehicle.name" />
       <textarea placeholder="Description" [(ngModel)]="newVehicle.description"></textarea>
       <input type="number" placeholder="Price" [(ngModel)]="newVehicle.price" />
       <input type="date" placeholder="First Registration" [(ngModel)]="newVehicle.dateOfFirstRegistration" />

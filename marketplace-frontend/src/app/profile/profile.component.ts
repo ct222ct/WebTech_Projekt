@@ -82,4 +82,19 @@ export class ProfileComponent implements OnInit {
       }
     );
   }
+  deleteProfile(): void {
+    if (confirm('Möchtest du dein Konto wirklich löschen? Dies kann nicht rückgängig gemacht werden.')) {
+      this.userService.deleteUserAccount().subscribe(
+        () => {
+          alert('Dein Konto wurde erfolgreich gelöscht.');
+          localStorage.removeItem('token'); // Entfernt das Token aus dem lokalen Speicher
+          window.location.href = '/login'; // Weiterleitung zur Login-Seite
+        },
+        (error) => {
+          console.error('Fehler beim Löschen des Kontos:', error);
+          this.errorMessage = 'Das Konto konnte nicht gelöscht werden.';
+        }
+      );
+    }
+  }
 }

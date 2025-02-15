@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { Vehicle, Model, Type, Mark, Category } = require('../models'); // Ensure Category is imported
-const { getVehiclesByType, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
+const { getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle }= require('../controllers/vehicleController');
 const { getSellerListings , markAsSold, getSearchListings} = require('../controllers/vehicleController');
 const upload = require('../middlewares/multer');
 const authMiddleware = require('../middlewares/auth');
 
-
+/*
 // Endpunkt: Alle Fahrzeuge einer Kategorie abrufen
 router.get('/:category', async (req, res) => {
   try {
@@ -34,6 +34,8 @@ router.get('/:category', async (req, res) => {
   }
 });
 
+ */
+
 // Fahrzeuge nach Modell abrufen
 router.get('/models/:id', async (req, res) => {
   try {
@@ -53,8 +55,9 @@ router.get('/types/:id', async (req, res) => {
     res.status(500).json({ message: 'Fehler beim Abrufen der Fahrzeuge', error });
   }
 });
-// Route to handle vehicles by type
-router.get('/', getVehiclesByType, authMiddleware);
+// Route to handle vehicles by category
+router.get('/category/:categoryId', getVehiclesByCategory);
+
 
 // Route to get seller's vehicle listings
 router.get('/seller/listings', authMiddleware, getSellerListings);

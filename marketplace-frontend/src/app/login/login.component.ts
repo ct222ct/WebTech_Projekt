@@ -1,32 +1,31 @@
 import { Component } from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {AuthService} from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.less'],
-  imports: [NgIf, FormsModule,],
+  imports: [NgIf, FormsModule],
 })
 export class LoginComponent {
   email: string = '';
   password: string = '';
   errorMessage: string | null = null;
-  returnUrl: string = '/'; // Standardwert, wenn keine Rücksprung-URL vorhanden ist
+  returnUrl: string = '/';
 
   constructor(
     private userService: UserService,
-    private authService: AuthService, // AuthService hinzufügen
+    private authService: AuthService, // AuthService für Login-Status
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    // Extrahiere die gespeicherte Rücksprung-URL
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
@@ -38,31 +37,35 @@ export class LoginComponent {
 
     this.userService.login(this.email, this.password).subscribe(
       (response) => {
-        localStorage.setItem('token', response.token); // Token speichern
+        this.authService.login(response.token); // Setze isLoggedIn auf true
         alert('Login erfolgreich!');
-        const returnUrl = localStorage.getItem('returnUrl'); // Letzte Seite abrufen
+
+        const returnUrl = localStorage.getItem('returnUrl');
 
         if (returnUrl && !returnUrl.includes('/register')) {
           this.router.navigate([returnUrl]);
         } else {
-          this.router.navigate(['/']); // Standard: Startseite
+          this.router.navigate(['/']);
         }
-        localStorage.removeItem('returnUrl'); // Rücksprung-URL löschen
-        //this.router.navigate(['/dashboard']); // Weiterleitung zur Dashboard-Seite
+        localStorage.removeItem('returnUrl');
       },
       (error) => {
         console.error('Fehler beim Login:', error);
-
-        if (error.status === 400) {
-          this.errorMessage = 'Ungültige Anmeldedaten. Bitte versuchen Sie es erneut.';
-        } else if (error.status === 401) {
-          this.errorMessage = 'Invalid email or password';
-        } else if (error.status === 500) {
-          this.errorMessage = 'Internal server error occurred during login';
-        } else {
-          this.errorMessage = 'An unknown error occurred during login';
-        }
+        this.errorMessage = this.getErrorMessage(error.status);
       }
     );
+  }
+
+  private getErrorMessage(status: number): string {
+    switch (status) {
+      case 400:
+        return 'Ungültige Anmeldedaten. Bitte versuchen Sie es erneut.';
+      case 401:
+        return 'Invalid email or password';
+      case 500:
+        return 'Internal server error occurred during login';
+      default:
+        return 'An unknown error occurred during login';
+    }
   }
 }

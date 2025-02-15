@@ -2,13 +2,41 @@
   <span class="logo">Marketplace</span>
   <nav class="nav-links">
     <a routerLink="/">Home</a>
-    <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
-    <a *ngIf="!isLoggedIn" routerLink="/register">Register</a>
-    <a *ngIf="isLoggedIn" routerLink="/profile">Profil</a>
-    <a *ngIf="isLoggedIn" (click)="logout()">Abmelden</a>
-    <a *ngIf="isLoggedIn" routerLink="/seller/listings">My Listings</a>
 
+    <!-- Dropdown für nicht eingeloggte Benutzer -->
+    <div *ngIf="!isLoggedIn" class="dropdown">
+      <button class="dropbtn">Konto ▼</button>
+      <div class="dropdown-content">
+        <a routerLink="/login">
+           Login
+        </a>
+        <a routerLink="/register">
+           Registrieren
+        </a>
+      </div>
+    </div>
 
+    <!-- Dropdown für eingeloggte Benutzer -->
+    <div *ngIf="isLoggedIn" class="dropdown">
+      <button class="dropbtn">
+        {{ username }} ▼
+      </button>
+      <div class="dropdown-content">
+        <span class="dropdown-header">Mein Marketplace</span>
+        <a routerLink="/profile">
+           Mein Profil
+        </a>
+        <a routerLink="/seller/listings">
+           Meine Anzeigen
+        </a>
+        <a routerLink="/messages">
+           Nachrichten
+        </a>
+        <a (click)="logout()">
+          Abmelden
+        </a>
+      </div>
+    </div>
   </nav>
 </div>
 <router-outlet></router-outlet>

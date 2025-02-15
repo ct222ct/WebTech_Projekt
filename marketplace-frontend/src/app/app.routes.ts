@@ -12,7 +12,6 @@ import {MotorbikesComponent} from './vehicles/motorbikes/motorbikes.component';
 import {VehicleListComponent} from './vehicle-list/vehicle-list.component';
 import {SellerComponent} from './seller/seller.component';
 import {SellerListingsComponent} from './seller-listings/seller-listings.component';
-import {BuyerListingsComponent} from './buyer-listings/buyer-listings.component';
 import {VehicleDetailsComponent} from './vehicles/vehicle-details/vehicle-details.component';
 
 export const routes: Routes = [
@@ -68,7 +67,6 @@ export const routes: Routes = [
   { path: 'seller', component: SellerComponent },
 
   { path: 'seller/listings', component: SellerListingsComponent , canActivate: [AuthGuard]},
-  { path: 'buyer-listings', component: BuyerListingsComponent },
   { path: 'vehicle-details/:id', component: VehicleDetailsComponent },
 
   // Standardroute für unbekannte Pfade

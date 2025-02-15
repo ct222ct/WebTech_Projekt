@@ -11,12 +11,13 @@ import {Router, RouterLink} from "@angular/router";
   standalone: true,
   imports: [FormsModule, NgForOf, NgIf, NgOptimizedImage, RouterLink],
 })
+
 export class MotorbikesComponent implements OnInit {
   vehicles: any[] = [];
-  marks: any[] = [];   // 🚀 Enthält NUR Marken der Kategorie Auto (1)
+  marks: any[] = [];   // 🚀 Enthält NUR Marken der Kategorie Motorrad (2)
   models: any[] = [];
   vehicleTypes: any[] = [];
-  selectedCategory: string = '2'; // Default: Autos
+  selectedCategory: string = '2'; // Default: Motorräder
   selectedMarke: string = '';
   selectedModel: string = '';
   selectedVehicleType: string = '';
@@ -30,18 +31,15 @@ export class MotorbikesComponent implements OnInit {
   fuelType: string = '';
   color: string = '';
   condition: string = '';
-  searchQuery: string = '';
   isLoading: boolean = false;
   showAdvancedFilters: boolean = false;
-
-
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    console.log('CarsComponent initialized');
-    this.loadMarks();  //  Lädt NUR Auto-Marken (selectedCategory)
-    this.loadAllVehicles(); // Lade alle Fahrzeuge beim Start
+    console.log('MotorcyclesComponent initialized');
+    this.loadMarks();  // Lädt NUR Motorrad-Marken (selectedCategory = 2)
+    this.loadAllVehicles(); // Lade alle Motorräder beim Start
     this.loadVehicleTypes();
   }
 
@@ -51,8 +49,9 @@ export class MotorbikesComponent implements OnInit {
 
   loadAllVehicles(): void {
     this.isLoading = true;
-    this.http.get<any[]>(`http://localhost:3000/api/vehicles/types/${this.selectedCategory}`).subscribe({
+    this.http.get<any[]>(`http://localhost:3000/api/vehicles/category/${this.selectedCategory}`).subscribe({
       next: (data) => {
+        console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
         this.isLoading = false;
       },
@@ -63,22 +62,20 @@ export class MotorbikesComponent implements OnInit {
     });
   }
 
-  // Lädt nur die Marken der Kategorie Auto (categoryId=1)
+  // Lädt nur die Marken der Kategorie Motorrad (categoryId=2)
   loadMarks(): void {
     this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
       next: (data) => {
         this.marks = data;
-        //console.log('Geladene Marken:', this.marks);
       },
       error: (error) => {
-        console.error('Fehler beim Laden der Marken:', error);
+        console.error('Fehler beim Laden der Motorrad-Marken:', error);
       },
     });
   }
 
-  //Lädt Modelle basierend auf der ausgewählten Marke
+  // Lädt Modelle basierend auf der ausgewählten Motorrad-Marke
   loadModels(): void {
-    //console.log(this.selectedModel);
     if (!this.selectedMarke) {
       this.models = [];
       return;
@@ -86,7 +83,7 @@ export class MotorbikesComponent implements OnInit {
     this.http.get<any[]>(`http://localhost:3000/api/models/${this.selectedMarke}`).subscribe({
       next: (data) => {
         this.models = data;
-        console.log('Geladene Modelle:', this.models);
+        console.log('Geladene Motorrad-Modelle:', this.models);
       },
       error: (error) => {
         console.error('Fehler beim Laden der Modelle:', error);
@@ -100,7 +97,7 @@ export class MotorbikesComponent implements OnInit {
         this.vehicleTypes = data;
       },
       error: (error) => {
-        console.error('Fehler beim Laden der Fahrzeugtypen:', error);
+        console.error('Fehler beim Laden der Motorrad-Typen:', error);
       },
     });
   }
@@ -123,7 +120,7 @@ export class MotorbikesComponent implements OnInit {
 
     // Prüfen, ob KEIN Filter gesetzt wurde -> Alle Fahrzeuge laden
     if (queryParams.toString() === '') {
-      console.log('Keine Filter gesetzt, lade alle Fahrzeuge');
+      console.log('Keine Filter gesetzt, lade alle Motorräder');
       this.loadAllVehicles();
       return;
     }
@@ -132,16 +129,17 @@ export class MotorbikesComponent implements OnInit {
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/searchMark/listings?${queryParams.toString()}`)
       .subscribe({
         next: (data) => {
-          console.log('Gefilterte Fahrzeuge:', data);
+          console.log('Gefilterte Motorräder:', data);
           this.vehicles = data;
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+          console.error('Fehler beim Abrufen der Motorräder:', error);
           this.isLoading = false;
         },
       });
   }
+
   resetFilters(): void {
     this.selectedMarke = '';
     this.selectedModel = '';
@@ -158,9 +156,7 @@ export class MotorbikesComponent implements OnInit {
     // Zurückgesetzte Werte sofort übernehmen
     this.models = []; // Falls Marke zurückgesetzt wurde, auch Modelle leeren
 
-    // Alle Fahrzeuge neu laden
+    // Alle Motorräder neu laden
     this.loadAllVehicles();
   }
-
-
 }

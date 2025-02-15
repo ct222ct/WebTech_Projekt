@@ -30,7 +30,6 @@ export class CarsComponent implements OnInit {
   fuelType: string = '';
   color: string = '';
   condition: string = '';
-  searchQuery: string = '';
   isLoading: boolean = false;
   showAdvancedFilters: boolean = false;
 
@@ -51,8 +50,9 @@ export class CarsComponent implements OnInit {
 
   loadAllVehicles(): void {
     this.isLoading = true;
-    this.http.get<any[]>(`http://localhost:3000/api/vehicles/types/${this.selectedCategory}`).subscribe({
+    this.http.get<any[]>(`http://localhost:3000/api/vehicles/category/${this.selectedCategory}`).subscribe({
       next: (data) => {
+        console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
         this.isLoading = false;
       },
@@ -62,6 +62,7 @@ export class CarsComponent implements OnInit {
       },
     });
   }
+
 
   // Lädt nur die Marken der Kategorie Auto (categoryId=1)
   loadMarks(): void {

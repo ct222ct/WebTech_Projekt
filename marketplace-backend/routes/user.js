@@ -133,24 +133,23 @@ router.post('/login', async (req, res) => {
     }
 });
 
-
-// Konto löschen
-router.delete('/user', async (req, res) => {
+//Benutzer löschen
+router.delete('/user', authMiddleware, async (req, res) => {
     try {
-        const { userId } = req.body;
-
+        const userId = req.user.id;
         const user = await User.findByPk(userId);
+
         if (!user) {
             return res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
 
         await user.destroy();
-
         res.json({ message: 'Benutzerkonto erfolgreich gelöscht' });
     } catch (error) {
         res.status(500).json({ message: 'Fehler beim Löschen des Benutzerkontos', error });
     }
 });
+
 
 // Hol die Daten des eingeloggten Benutzers
 router.get('/me', authMiddleware, getUser);

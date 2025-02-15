@@ -35,8 +35,9 @@ export class UserService {
     return this.http.put('http://localhost:3000/api/users/update', updatedData, { headers });
   }
 
-  deleteAccount(): Observable<any> {
-    return this.http.delete('/api/user');
+  deleteUserAccount(): Observable<any> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
+    return this.http.delete(`${this.apiUrl}/user`, { headers });
   }
 
   login(email: string, password: string): Observable<any> {

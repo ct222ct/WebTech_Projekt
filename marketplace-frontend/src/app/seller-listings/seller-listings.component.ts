@@ -21,7 +21,18 @@ export class SellerListingsComponent implements OnInit {
   isModalOpen: boolean = false; // Controls modal visibility
   models: any[] = []; // Models from DB
   types: any[] = []; // Types from DB
+  marks: any[] = []; // Marken aus der DB
+  categories: any[] = []; // Kategorien aus der DB
+
+
+  selectedCategory: string = ''; // Kategorie auswählen
+  selectedMarkId: string = ''; // Marke auswählen
+  //selectedModel: string = ''; // Modell auswählen
+
   newVehicle: any = {
+    categoryId: '', // Will be selected from dropdown
+    userId: '', // Will be set from user data
+    markId: '', // Will be selected from dropdown
     name: '',
     modelId: '', // Will be selected from dropdown
     typeId: '', // Will be selected from dropdown
@@ -41,7 +52,7 @@ export class SellerListingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserAndListings();
-    this.loadModelsAndTypes();
+    this.loadCategories();
 
   }
 
@@ -94,35 +105,74 @@ export class SellerListingsComponent implements OnInit {
 
   openModal(): void {
     this.isModalOpen = true;
+    this.selectedCategory = ''; // Reset der Auswahl
+    this.selectedMarkId = '';
+    this.newVehicle.modelId = '';
+    this.newVehicle.typeId = '';
   }
 
   closeModal(): void {
     this.isModalOpen = false;
   }
 
-  loadModelsAndTypes(): void {
-    // Lade die Modelle
-    this.http.get<any[]>('http://localhost:3000/api/models').subscribe({
+  loadCategories(): void {
+    this.http.get<any[]>('http://localhost:3000/api/categories').subscribe({
+      next: (data) => {
+        this.categories = data;
+        console.log('Geladene Kategorien:', this.categories);
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Kategorien:', error);
+      }
+    });
+  }
+
+  loadMarks(): void {
+    if (!this.selectedCategory) return; // Falls keine Kategorie ausgewählt ist, nichts laden
+
+    this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
+      next: (data) => {
+        this.marks = data;
+        this.selectedMarkId = '';
+        this.models = []; // Zurücksetzen der Modelle
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Marken:', error);
+      }
+    });
+  }
+
+  loadModels(): void {
+    if (!this.selectedMarkId) return;
+
+    this.http.get<any[]>(`http://localhost:3000/api/models/${this.selectedMarkId}`).subscribe({
       next: (data) => {
         this.models = data;
-        console.log('Geladene Modelle:', this.models);
+        this.newVehicle.modelId = '';
       },
       error: (error) => {
         console.error('Fehler beim Laden der Modelle:', error);
       }
     });
+  }
 
-    // Lade die Typen
-    this.http.get<any[]>('http://localhost:3000/api/types').subscribe({
+  loadTypes(): void {
+    if (!this.selectedCategory) return;
+
+    this.http.get<any[]>(`http://localhost:3000/api/types/${this.selectedCategory}`).subscribe({
       next: (data) => {
         this.types = data;
-        console.log('Geladene Typen:', this.types);
+        this.newVehicle.typeId = '';
       },
       error: (error) => {
         console.error('Fehler beim Laden der Typen:', error);
       }
     });
   }
+
+
+
+
   addVehicle(): void {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -133,7 +183,9 @@ export class SellerListingsComponent implements OnInit {
     this.userService.getUserData().subscribe(user => {
       console.log('Benutzer-ID erhalten:', user.id);
 
-      this.newVehicle.userId = user.id; //  Benutzer-ID setzen
+      this.newVehicle.userId = user.id; // Benutzer-ID setzen
+      this.newVehicle.categoryId = this.selectedCategory; // Kategorie-ID setzen
+      this.newVehicle.markId = this.selectedMarkId; // Marke-ID setzen
 
       this.http.post('http://localhost:3000/api/vehicles', this.newVehicle, {
         headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
@@ -150,8 +202,6 @@ export class SellerListingsComponent implements OnInit {
       });
     });
   }
-
-
 
   openEditModal(vehicle: any): void {
     this.editedVehicle = { ...vehicle }; // Kopie der Fahrzeugdaten speichern
@@ -174,12 +224,12 @@ export class SellerListingsComponent implements OnInit {
     this.http.put(`http://localhost:3000/api/vehicles/${this.editedVehicle.id}`, this.editedVehicle, { headers })
       .subscribe({
         next: () => {
-          console.log('✅ Fahrzeug erfolgreich aktualisiert.');
+          console.log('Fahrzeug erfolgreich aktualisiert.');
           this.fetchSellerListings(); // Fahrzeugliste neu laden
           this.closeEditModal(); // Modal schließen
         },
         error: (error) => {
-          console.error('❌ Fehler beim Aktualisieren des Fahrzeugs:', error);
+          console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
         }
       });
   }
@@ -188,7 +238,7 @@ export class SellerListingsComponent implements OnInit {
   deleteVehicle(vehicleId: number): void {
     const token = localStorage.getItem('token'); // 🔹 Token abrufen
     if (!token) {
-      console.error('❌ Kein Token gefunden im LocalStorage');
+      console.error('Kein Token gefunden im LocalStorage');
       return;
     }
 
@@ -199,10 +249,10 @@ export class SellerListingsComponent implements OnInit {
     this.http.delete(`http://localhost:3000/api/vehicles/${vehicleId}`, { headers }).subscribe({
       next: () => {
         this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
-        console.log('✅ Fahrzeug erfolgreich gelöscht:', vehicleId);
+        console.log('Fahrzeug erfolgreich gelöscht:', vehicleId);
       },
       error: (error) => {
-        console.error('❌ Fehler beim Löschen des Fahrzeugs:', error);
+        console.error('Fehler beim Löschen des Fahrzeugs:', error);
       }
     });
   }

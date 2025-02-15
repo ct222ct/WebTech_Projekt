@@ -15,24 +15,18 @@ import {NgIf} from '@angular/common';
 })
 export class AppComponent {
   isLoggedIn: boolean = false;
+  username: string = 'Benutzer';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // Überprüfe den Login-Status beim Laden der Anwendung
-    this.isLoggedIn = this.authService.isLoggedIn();
-
-    // Beobachte Änderungen des Login-Status
     this.authService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
     });
   }
 
   logout(): void {
-    this.authService.logout(); // Benutzer ausloggen
-    this.router.navigate(['/']); // Weiterleitung zur Startseite
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
-
-  title = 'Marketplace'; // Füge die Eigenschaft hinzu
-
 }
