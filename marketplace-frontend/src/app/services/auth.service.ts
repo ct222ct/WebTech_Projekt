@@ -1,58 +1,13 @@
-/*
-import { HttpClient } from '@angular/common/http';
-
-import {Inject, Injectable, PLATFORM_ID} from '@angular/core';
-import {BehaviorSubject, Subject} from 'rxjs';
-import {LocalStorageService} from './local-storage.service';
-import {isPlatformBrowser} from '@angular/common';
-
-@Injectable({
- providedIn: 'root',
-})
-export class AuthService {
- private apiUrl = 'http://localhost:3000/api/auth';
-
-// private loggedIn: boolean = false;
- loginStatusChanged = new Subject<boolean>();
-
- constructor( @Inject(PLATFORM_ID) private platformId: Object) {
-   if (isPlatformBrowser(this.platformId)) {
-     const hasToken = !!localStorage.getItem('token');
-     this.loggedInSubject.next(hasToken);
-   }
- }
-
- /*
-   // Schert das Token und ändert den Login-Status
-   saveLogin(token: string): void {
-     this.localStorageService.setItem('token', token);
-     this.loggedIn = true;
-     this.loginStatusChanged.next(true);
-   }
-constructor(private http: HttpClient,private localStorageService: LocalStorageService) {
-this.loggedIn = !!this.localStorageService.getItem('token');
-}
-register(email: string, password: string, name: string, address: string) {
-   return this.post(`${this.apiUrl}/register`, {email, password, name, address});
- }
-
- private hasToken(): boolean {
-   return !!localStorage.getItem('token');
-
-private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken()); // Initialer Status
- isLoggedIn$ = this.loggedInSubject.asObservable(); // Observable für Login-Status
- }
-  */
-
-
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
+import {jwtDecode} from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private user: any = null;
   private loggedInSubject = new BehaviorSubject<boolean>(false);
   isLoggedIn$ = this.loggedInSubject.asObservable();
 
@@ -80,4 +35,40 @@ export class AuthService {
       this.loggedInSubject.next(false);
     }
   }
+
+  getToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  }
+  getUserId(): number | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        return decodedToken.id;
+      } catch (error) {
+        console.error('Fehler beim Dekodieren des Tokens:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+  getUserEmail(): number | null {
+    const token = this.getToken();
+    console.log('🔍 Token:', token);
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        return decodedToken.email;
+      } catch (error) {
+        console.error('Fehler beim Dekodieren des Tokens:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+
 }

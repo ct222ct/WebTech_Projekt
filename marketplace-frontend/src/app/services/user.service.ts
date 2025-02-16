@@ -23,12 +23,7 @@ export class UserService {
 
     return this.http.get(`${this.apiUrl}/me`, { headers });
   }
-  /*
-  // Aktualisieren der Benutzerdaten
-  updateUserData(updatedData: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/update`, updatedData);
-  }
-   */
+
 
   updateUserData(updatedData: any): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);

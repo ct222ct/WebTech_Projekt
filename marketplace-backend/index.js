@@ -78,6 +78,40 @@ app.use('/api/marks', markRoutes);
 //app.use('/search', vehicleRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+
+const http = require('http');
+const server = http.createServer(app); // Server definieren
+const socketIo = require('socket.io');
+const io = socketIo(server, {cors: {
+         origin: "http://localhost:4200", // Angular-Frontend
+         methods: ["GET", "POST"] }  });
+
+// Starte den WebSocket-Server
+io.on('connection', (socket) => {
+    console.log('🟢 Ein Benutzer hat sich verbunden:', socket.id);
+
+    socket.on('joinChat', (chatId) => {
+        socket.join(chatId);
+        console.log(`🟢 Benutzer ist Chat ${chatId} beigetreten`);
+    });
+
+    socket.on('sendMessage', (message) => {
+        io.to(message.chatId).emit('receiveMessage', message);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('🔴 Benutzer hat die Verbindung getrennt');
+    });
+});
+
+
+const chatRoutes = require('./routes/chatRoutes'); // Importiere Chat-Routen
+
+app.use('/api/chat', chatRoutes); // Chat-Routen unter "/api/chat"
+
+
+
 // Datenbank synchronisieren
 (async () => {
     try {

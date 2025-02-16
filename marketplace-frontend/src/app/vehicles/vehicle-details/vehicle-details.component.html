@@ -17,8 +17,9 @@
     </div>
 
     <h3>{{ vehicle.name }}</h3>
-    <p><strong>Verkäufer:</strong> {{ vehicle.seller?.name || 'Unbekannt' }}</p>
-    <p><strong>Marke:</strong> {{ vehicle.mark || 'Nicht verfügbar' }}</p>
+    <p><strong>Verkäufer:</strong> {{ userEmail || 'Unbekannt' }}</p>
+    <p><strong>Marke:</strong> {{ vehicle.markId || 'Nicht verfügbar' }}</p>
+    <p><strong>Modell:</strong> {{ vehicle.modelId || 'Nicht verfügbar' }}</p>
     <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
     <p><strong>Kilometerstand:</strong> {{ vehicle.mileage }} km</p>
     <p><strong>Erstzulassung:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
@@ -26,6 +27,19 @@
     <p><strong>Kraftstoffart:</strong> {{ vehicle.fuelType }}</p>
     <p><strong>Zustand:</strong> {{ vehicle.condition }}</p>
     <p><strong>Beschreibung:</strong> {{ vehicle.description }}</p>
+
+
+    <!-- 🚀 Chat Box -->
+    <div class="chat-container">
+      <h3>Chat mit Verkäufer</h3>
+      <div class="chat-messages">
+        <div *ngFor="let message of messages" class="{{ message.senderId === userId ? 'sent' : 'received' }}">
+          {{ message.text }}
+        </div>
+      </div>
+      <input type="text" [(ngModel)]="newMessage" placeholder="Nachricht eingeben...">
+      <button (click)="sendMessage()">Senden</button>
+    </div>
 
     <button (click)="goBack()" class="back-btn">← Zurück zur Fahrzeugliste</button>
   </div>

@@ -48,8 +48,11 @@ module.exports = (sequelize, DataTypes) => {
 
     // Assoziationen
     User.associate = (models) => {
-        console.log('Initialisiere Assoziation für User mit Vehicle'); // Debugging
+        //console.log('Initialisiere Assoziation für User mit Vehicle'); // Debugging
         User.hasMany(models.Vehicle, { foreignKey: 'userId', as: 'vehicles' });
+        User.hasMany(models.Chat, { foreignKey: 'buyerId', as: 'boughtChats' });
+        User.hasMany(models.Chat, { foreignKey: 'sellerId', as: 'soldChats' });
+        User.hasMany(models.Message, { foreignKey: 'senderId', as: 'messages' });
     };
 
     return User;

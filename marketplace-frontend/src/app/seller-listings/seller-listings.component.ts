@@ -11,8 +11,7 @@ import {FormsModule} from '@angular/forms'; // Import UserService
   imports: [
     NgIf,
     NgForOf,
-    FormsModule,
-    NgOptimizedImage
+    FormsModule
   ]
 })
 export class SellerListingsComponent implements OnInit {
