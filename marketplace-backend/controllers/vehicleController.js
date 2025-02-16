@@ -1,21 +1,22 @@
-const { Vehicle, VehiclePictures } = require('../models'); // Importieren des Modells
-const { Op } = require('sequelize');
+// Importieren der benötigten Module
+const { Vehicle, VehiclePictures } = require('../models'); // Datenbank-Modelle
+const { Op } = require('sequelize'); // Sequelize-Operatoren für SQL-Abfragen
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 
+/**
+ * Holt alle Fahrzeuge einer bestimmten Kategorie
+ */
 const getVehiclesByCategory = async (req, res) => {
     try {
-        const { categoryId } = req.params; // typeId aus der Anfrage
-        console.log('Kategorie-ID:', categoryId);
-
+        const { categoryId } = req.params; // Kategorie-ID aus der Anfrage
         const vehicles = await Vehicle.findAll({
             where: {
                 categoryId: categoryId,
-                sold: false, // Exclude sold vehicles
+                sold: false, // Nur verfügbare Fahrzeuge abrufen
             },
         });
-
-        console.log('Gefundene Fahrzeuge:', vehicles);
 
         if (vehicles.length === 0) {
             return res.status(404).json({ message: 'Keine Fahrzeuge gefunden.' });
@@ -28,6 +29,9 @@ const getVehiclesByCategory = async (req, res) => {
     }
 };
 
+/**
+ * Fügt ein neues Fahrzeug hinzu
+ */
 const addVehicle = async (req, res) => {
     try {
         const {
@@ -41,16 +45,14 @@ const addVehicle = async (req, res) => {
             return res.status(401).json({ message: 'Unauthorized: Benutzer-ID fehlt' });
         }
 
-        console.log('Fahrzeugdaten:', req.body);
-
-        // 🚗 Fahrzeug in DB speichern
+        // Neues Fahrzeug in der Datenbank speichern
         const vehicle = await Vehicle.create({
             name, modelId, typeId, markId, categoryId,
             description, price, dateOfFirstRegistration, mileage,
             fuelType, color, condition, userId
         });
 
-        // 📸 Bilder speichern
+        // Falls Bilder hochgeladen wurden, speichern
         if (req.files && req.files.length > 0) {
             const imageRecords = req.files.map(file => ({
                 vehicleId: vehicle.id,
@@ -66,59 +68,35 @@ const addVehicle = async (req, res) => {
     }
 };
 
+/**
+ * Aktualisiert ein Fahrzeug
+ */
 const updateVehicle = async (req, res) => {
     try {
         const { id } = req.params;
         const {
-            name,
-            modelId,
-            typeId,
-            description,
-            price,
-            dateOfFirstRegistration,
-            mileage,
-            fuelType,
-            color,
-            condition
+            name, modelId, typeId, description, price,
+            dateOfFirstRegistration, mileage, fuelType, color, condition
         } = req.body;
 
-        console.log(`Fahrzeug-Update gestartet für ID: ${id}`);
-
-        // 🚨 Prüfen, ob das Token korrekt übermittelt wurde
         if (!req.user || !req.user.id) {
-            console.error('Benutzer-ID fehlt im Token!');
             return res.status(401).json({ message: 'Unauthorized: Benutzer-ID fehlt' });
         }
 
-        const userId = req.user.id;
-        console.log(`Benutzer-ID: ${userId}`);
-
-        // Fahrzeug suchen
         const vehicle = await Vehicle.findByPk(id);
         if (!vehicle) {
             return res.status(404).json({ message: 'Fahrzeug nicht gefunden' });
         }
 
-        // Prüfen, ob das Fahrzeug dem angemeldeten Benutzer gehört
-        if (vehicle.userId !== userId) {
+        if (vehicle.userId !== req.user.id) {
             return res.status(403).json({ message: 'Nicht berechtigt, dieses Fahrzeug zu bearbeiten' });
         }
 
-        // Fahrzeugdaten aktualisieren
         await vehicle.update({
-            name,
-            modelId,
-            typeId,
-            description,
-            price,
-            dateOfFirstRegistration,
-            mileage,
-            fuelType,
-            color,
-            condition
+            name, modelId, typeId, description, price,
+            dateOfFirstRegistration, mileage, fuelType, color, condition
         });
 
-        console.log(`Fahrzeug erfolgreich aktualisiert: ${vehicle.id}`);
         res.json({ message: 'Fahrzeug aktualisiert', vehicle });
     } catch (error) {
         console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
@@ -126,31 +104,27 @@ const updateVehicle = async (req, res) => {
     }
 };
 
+/**
+ * Löscht ein Fahrzeug
+ */
 const deleteVehicle = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // 🔹 Sicherstellen, dass der Benutzer authentifiziert ist
         if (!req.user || !req.user.id) {
-            console.error('Kein Benutzer-Token empfangen');
             return res.status(401).json({ message: 'Unauthorized: Kein Benutzer gefunden' });
         }
-
-        console.log('🗑 Fahrzeug löschen mit ID:', id, 'von Benutzer-ID:', req.user.id);
 
         const vehicle = await Vehicle.findByPk(id);
         if (!vehicle) {
             return res.status(404).json({ error: 'Fahrzeug nicht gefunden' });
         }
 
-        // 🔹 Überprüfung, ob das Fahrzeug dem Benutzer gehört
         if (vehicle.userId !== req.user.id) {
-            console.error('Unberechtigter Löschversuch');
             return res.status(403).json({ message: 'Unberechtigt: Dieses Fahrzeug gehört nicht dir' });
         }
 
         await vehicle.destroy();
-        console.log('Fahrzeug erfolgreich gelöscht:', id);
         res.status(200).json({ message: 'Fahrzeug erfolgreich gelöscht' });
     } catch (error) {
         console.error('Fehler beim Löschen des Fahrzeugs:', error);
@@ -158,28 +132,26 @@ const deleteVehicle = async (req, res) => {
     }
 };
 
+/**
+ * Holt alle Fahrzeuge eines Verkäufers
+ */
 const getSellerListings = async (req, res) => {
     try {
-        console.log('Abruf der Fahrzeuge für Benutzer-ID:', req.user.id);
-
         const vehicles = await Vehicle.findAll({
             where: { userId: req.user.id },
-            include: [{ model: VehiclePictures, as: 'pictures' }]  // Bilder einbinden
+            include: [{ model: VehiclePictures, as: 'pictures' }] // Bilder mit einbinden
         });
 
-        if (!vehicles.length) {
-            console.log('Keine Fahrzeuge gefunden.');
-            return res.json([]);
-        }
-
-        console.log('Gefundene Fahrzeuge:', vehicles);
-        res.json(vehicles);
+        res.json(vehicles.length ? vehicles : []);
     } catch (error) {
         console.error('Fehler beim Abrufen der Fahrzeuge:', error);
         res.status(500).json({ message: 'Serverfehler' });
     }
 };
 
+/**
+ * Markiert ein Fahrzeug als verkauft
+ */
 const markAsSold = async (req, res) => {
     try {
         const { vehicleId } = req.params;
@@ -189,7 +161,6 @@ const markAsSold = async (req, res) => {
             return res.status(404).json({ message: 'Vehicle not found' });
         }
 
-        // Ensure only the owner can mark it as sold
         if (vehicle.userId !== req.user.id) {
             return res.status(403).json({ message: 'Unauthorized' });
         }
@@ -197,7 +168,6 @@ const markAsSold = async (req, res) => {
         vehicle.sold = true;
         await vehicle.save();
 
-        console.log(`Vehicle ${vehicleId} marked as sold `); // Debugging
         res.json({ message: 'Vehicle marked as sold', vehicle });
     } catch (error) {
         console.error('Error marking vehicle as sold:', error);
@@ -205,15 +175,13 @@ const markAsSold = async (req, res) => {
     }
 };
 
+/**
+ * Suchanfrage für Fahrzeuge
+ */
 const getSearchListings = async (req, res) => {
     try {
-        console.log('🔍 Suchanfrage:', req.query);
-        console.log('Abruf der Fahrzeuge für Marke:', req.query.markId);
-        console.log('Abruf der Fahrzeuge für Model:', req.query.modelId);
-        console.log('Abruf der Fahrzeuge für Type:', req.query.typeId);
+        let whereCondition = { sold: false };
 
-        let whereCondition = {};
-        whereCondition.sold = false;
         if (req.query.markId) whereCondition.markId = req.query.markId;
         if (req.query.modelId) whereCondition.modelId = req.query.modelId;
         if (req.query.typeId) whereCondition.typeId = req.query.typeId;
@@ -226,20 +194,16 @@ const getSearchListings = async (req, res) => {
 
         const vehicles = await Vehicle.findAll({ where: whereCondition });
 
-
-        if (!vehicles.length) {
-            console.log('Keine Fahrzeuge gefunden.');
-            return res.json([]);
-        }
-
-        console.log('Gefundene Fahrzeuge:', vehicles);
         res.json(vehicles);
     } catch (error) {
         console.error('Fehler beim Abrufen der Fahrzeuge:', error);
-        res.status(500).json({message: 'Serverfehler'});
+        res.status(500).json({ message: 'Serverfehler' });
     }
 };
 
+/**
+ * Holt die Bilder eines Fahrzeugs
+ */
 const getVehicleImages = async (req, res) => {
     try {
         const { vehicleId } = req.params;
@@ -248,35 +212,21 @@ const getVehicleImages = async (req, res) => {
             attributes: ['url']
         });
 
-        if (!images.length) {
-            return res.status(404).json({ message: 'Keine Bilder gefunden' });
-        }
-
-        // Absolute URLs generieren
-        const baseUrl = "http://localhost:3000"; // Falls dein Backend auf einer anderen URL läuft, passe das an
-        const formattedImages = images.map(img => ({
-            url: `${baseUrl}${img.url}`
-        }));
-
-        res.json(formattedImages);
+        res.json(images.length ? images.map(img => ({ url: `http://localhost:3000${img.url}` })) : []);
     } catch (error) {
         console.error('Fehler beim Abrufen der Bilder:', error);
         res.status(500).json({ error: 'Fehler beim Abrufen der Bilder' });
     }
 };
 
-const multer = require('multer');
-
+/**
+ * Multer-Konfiguration für Bilder-Uploads
+ */
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/');  // Stelle sicher, dass dies das korrekte Verzeichnis ist!
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
+    destination: (req, file, cb) => cb(null, 'public/uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-
-module.exports = { upload,getVehicleImages, getSearchListings, getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold }; // Exportieren der Funktionen
+module.exports = { upload, getVehicleImages, getSearchListings, getVehiclesByCategory, addVehicle, updateVehicle, deleteVehicle, getSellerListings, markAsSold };

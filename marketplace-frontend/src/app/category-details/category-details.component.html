@@ -1,12 +1,18 @@
 <div class="container">
+  <!-- Überschrift zeigt den Namen der aktuellen Kategorie -->
   <h2>Details für Kategorie: {{ categoryName }}</h2>
+
+  <!-- Abschnitt für die Marken (Brands) -->
   <h3>Marken</h3>
   <ul>
+    <!-- *ngFor-Direktive iteriert über das `marks`-Array und gibt jede Marke aus -->
     <li *ngFor="let mark of marks">{{ mark.name }}</li>
   </ul>
 
+  <!-- Abschnitt für die Typen (Types) -->
   <h3>Typen</h3>
   <ul>
+    <!-- *ngFor-Direktive iteriert über das `types`-Array und gibt jeden Typ aus -->
     <li *ngFor="let type of types">{{ type.name }}</li>
   </ul>
 </div>

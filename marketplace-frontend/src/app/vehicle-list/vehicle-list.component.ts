@@ -1,35 +1,39 @@
+// Importiert die benötigten Angular-Module für HTTP-Anfragen und Direktiven
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgForOf, NgIf } from '@angular/common';
 
+// Deklariert die Fahrzeuglisten-Komponente
 @Component({
-  selector: 'app-vehicle-list',
-  templateUrl: './vehicle-list.component.html',
-  styleUrls: ['./vehicle-list.component.less'],
+  selector: 'app-vehicle-list', // Definiert den CSS-Selektor für die Komponente
+  templateUrl: './vehicle-list.component.html', // Verweist auf die HTML-Template-Datei der Komponente
+  styleUrls: ['./vehicle-list.component.less'], // Verweist auf die zugehörige Stylesheet-Datei
   imports: [
-    NgIf,
-    NgForOf,
+    NgIf, // Ermöglicht die Nutzung von *ngIf für bedingte Anzeige
+    NgForOf, // Ermöglicht die Nutzung von *ngFor für Listen
   ]
 })
 export class VehicleListComponent implements OnInit {
-  cars: any[] = [];
-  motorbikes: any[] = [];
-  isLoading: boolean = true;
+  cars: any[] = []; // Speichert die Liste der Autos
+  motorbikes: any[] = []; // Speichert die Liste der Motorräder
+  isLoading: boolean = true; // Zeigt den Ladezustand der Daten an
 
   constructor(private http: HttpClient) {}
 
+  // Wird beim Initialisieren der Komponente aufgerufen
   ngOnInit(): void {
-    console.log('Fahrzeugliste wird geladen');
     this.fetchVehicles();
   }
 
+  /**
+   * Ruft die Fahrzeuglisten für Autos und Motorräder ab
+   */
   fetchVehicles(): void {
-    // Autos abrufen
+    // Autos abrufen (Fahrzeugtyp 1)
     this.http.get<any[]>('http://localhost:3000/api/vehicles/types/1').subscribe({
       next: (data) => {
-        console.log('Autos:', data);
-        this.cars = data;
-        this.isLoading = false;
+        this.cars = data; // Speichert die Autos in der Liste
+        this.isLoading = false; // Setzt den Ladezustand auf false
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der Autos:', error);
@@ -37,12 +41,11 @@ export class VehicleListComponent implements OnInit {
       },
     });
 
-    // Motorräder abrufen
+    // Motorräder abrufen (Fahrzeugtyp 2)
     this.http.get<any[]>('http://localhost:3000/api/vehicles/types/2').subscribe({
       next: (data) => {
-        console.log('Motorräder:', data);
-        this.motorbikes = data;
-        this.isLoading = false;
+        this.motorbikes = data; // Speichert die Motorräder in der Liste
+        this.isLoading = false; // Setzt den Ladezustand auf false
       },
       error: (error) => {
         console.error('Fehler beim Abrufen der Motorräder:', error);
@@ -51,8 +54,12 @@ export class VehicleListComponent implements OnInit {
     });
   }
 
+  /**
+   * Öffnet die Detailansicht für ein Fahrzeug
+   * @param vehicle - Das ausgewählte Fahrzeug
+   */
   viewDetails(vehicle: any): void {
     console.log('Details für Fahrzeug:', vehicle);
-    // Hier können Sie weitere Logik wie Routing oder Modals implementieren
+    // Hier können Sie z. B. ein Modal öffnen oder zur Detailseite navigieren
   }
 }

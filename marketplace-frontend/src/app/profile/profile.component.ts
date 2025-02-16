@@ -1,18 +1,21 @@
+// Importiert die benötigten Angular-Module und Services
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
-import {NgIf} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { UserService } from '../services/user.service'; // Service für API-Kommunikation (Benutzerdaten)
+import { NgIf } from '@angular/common'; // Ermöglicht bedingte Darstellung im Template (*ngIf)
+import { FormsModule } from '@angular/forms'; // Ermöglicht Zwei-Wege-Datenbindung (ngModel)
 
+// Deklariert die Metadaten für die Profil-Komponente
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.component.html',
+  selector: 'app-profile', // Definiert den CSS-Selektor für die Komponente
+  templateUrl: './profile.component.html', // Verweist auf die HTML-Template-Datei der Komponente
   imports: [
-    NgIf,
-    FormsModule
+    NgIf, // Ermöglicht die Nutzung von *ngIf in der HTML-Datei
+    FormsModule // Ermöglicht Formulareingaben und Zwei-Wege-Datenbindung
   ],
-  styleUrls: ['./profile.component.less']
+  styleUrls: ['./profile.component.less'] // Verweist auf die zugehörige Stylesheet-Datei
 })
 export class ProfileComponent implements OnInit {
+  // Objekt zur Speicherung der Benutzerdaten
   user = {
     name: '',
     email: '',
@@ -22,15 +25,19 @@ export class ProfileComponent implements OnInit {
     password: '',
     confirmPassword: ''
   };
-  errorMessage: string | null = null;
-  isEditMode: boolean = false; // Bearbeitungsmodus steuern
 
+  errorMessage: string | null = null; // Speichert mögliche Fehlermeldungen für die UI
+  isEditMode: boolean = false; // Steuert den Bearbeitungsmodus (true = Bearbeitung aktiv)
+
+  // Konstruktor: Initialisiert den UserService für API-Aufrufe
   constructor(private userService: UserService) {}
 
+  // Wird beim Initialisieren der Komponente aufgerufen
   ngOnInit(): void {
-    this.loadUserData();
+    this.loadUserData(); // Lädt die Benutzerdaten aus dem Backend
   }
 
+  // Methode zum Laden der Benutzerdaten aus der API
   loadUserData(): void {
     this.userService.getUserData().subscribe(
       (data) => {
@@ -47,32 +54,37 @@ export class ProfileComponent implements OnInit {
     );
   }
 
+  // Methode zum Umschalten des Bearbeitungsmodus
   toggleEditMode(): void {
-    this.isEditMode = !this.isEditMode; // Bearbeitungsmodus umschalten
+    this.isEditMode = !this.isEditMode; // Umschalten des Bearbeitungsmodus
     if (!this.isEditMode) {
-      // Wenn der Bearbeitungsmodus deaktiviert wird, lade die Originaldaten erneut
+      // Falls der Bearbeitungsmodus deaktiviert wird, lade die Originaldaten erneut
       this.loadUserData();
     }
   }
 
+  // Methode zum Speichern der Änderungen im Profil
   saveProfile(): void {
+    // Prüft, ob die eingegebenen Passwörter übereinstimmen
     if (this.user.password && this.user.password !== this.user.confirmPassword) {
       this.errorMessage = 'Die Passwörter stimmen nicht überein.';
       return;
     }
 
+    // Erstellt ein Objekt mit den aktualisierten Daten
     const updatedData = {
       name: this.user.name,
       email: this.user.email,
       street: this.user.street,
       city: this.user.city,
       postalCode: this.user.postalCode,
-      password: this.user.password ? this.user.password : undefined
+      password: this.user.password ? this.user.password : undefined // Sendet nur das Passwort, wenn es geändert wurde
     };
 
+    // Ruft die API auf, um die Benutzerdaten zu aktualisieren
     this.userService.updateUserData(updatedData).subscribe(
       () => {
-        alert('Profil erfolgreich aktualisiert');
+        alert('Profil erfolgreich aktualisiert'); // Erfolgsbenachrichtigung
         this.errorMessage = null;
         this.isEditMode = false; // Bearbeitungsmodus deaktivieren
       },
@@ -82,12 +94,15 @@ export class ProfileComponent implements OnInit {
       }
     );
   }
+
+  // Methode zum Löschen des Benutzerkontos
   deleteProfile(): void {
+    // Sicherheitsabfrage, um versehentliches Löschen zu vermeiden
     if (confirm('Möchtest du dein Konto wirklich löschen? Dies kann nicht rückgängig gemacht werden.')) {
       this.userService.deleteUserAccount().subscribe(
         () => {
           alert('Dein Konto wurde erfolgreich gelöscht.');
-          localStorage.removeItem('token'); // Entfernt das Token aus dem lokalen Speicher
+          localStorage.removeItem('token'); // Entfernt das gespeicherte Token aus dem lokalen Speicher
           window.location.href = '/login'; // Weiterleitung zur Login-Seite
         },
         (error) => {

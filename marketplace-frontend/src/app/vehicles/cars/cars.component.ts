@@ -1,69 +1,77 @@
+// Importiert die benötigten Angular-Module für HTTP-Anfragen, Formulare und Routing
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { NgForOf, NgIf, NgOptimizedImage } from "@angular/common";
+import { NgForOf, NgIf } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 
+// Deklariert die Fahrzeug-Kategorie "Autos" als eigenständige Komponente
 @Component({
-  selector: 'app-cars',
-  templateUrl: './cars.component.html',
-  styleUrls: ['./cars.component.less'],
+  selector: 'app-cars', // Definiert den CSS-Selektor für die Komponente
+  templateUrl: './cars.component.html', // Verweist auf die HTML-Template-Datei der Komponente
+  styleUrls: ['./cars.component.less'], // Verweist auf die zugehörige Stylesheet-Datei
   standalone: true,
-  imports: [FormsModule, NgForOf, NgIf, RouterLink],
+  imports: [FormsModule, NgForOf, NgIf, RouterLink], // Importiert Formulare, Direktiven und RouterLink
 })
 export class CarsComponent implements OnInit {
-  vehicles: any[] = [];
-  marks: any[] = [];   // 🚀 Enthält NUR Marken der Kategorie Auto (1)
-  models: any[] = [];
-  vehicleTypes: any[] = [];
-  selectedCategory: string = '1'; // Default: Autos
-  selectedMarke: string = '';
-  selectedModel: string = '';
-  selectedVehicleType: string = '';
-  priceMin: number | null = null;
-  priceMax: number | null = null;
-  sellerCity: string = '';
-  mileageMin: number | null = null;
-  mileageMax: number | null = null;
-  firstRegistrationMin: string = '';
-  firstRegistrationMax: string = '';
-  fuelType: string = '';
-  color: string = '';
-  condition: string = '';
-  isLoading: boolean = false;
-  showAdvancedFilters: boolean = false;
+  vehicles: any[] = []; // Speichert die geladenen Fahrzeuge
+  marks: any[] = []; // Speichert die Fahrzeugmarken (nur für Autos)
+  models: any[] = []; // Speichert die Fahrzeugmodelle
+  vehicleTypes: any[] = []; // Speichert die Fahrzeugtypen
+
+  // Suchfilter-Optionen
+  selectedCategory: string = '1'; // Standardmäßig Autos (Kategorie 1)
+  selectedMarke: string = ''; // Ausgewählte Marke
+  selectedModel: string = ''; // Ausgewähltes Modell
+  selectedVehicleType: string = ''; // Ausgewählter Fahrzeugtyp
+  priceMin: number | null = null; // Mindestpreis
+  priceMax: number | null = null; // Maximalpreis
+  sellerCity: string = ''; // Stadt des Verkäufers
+  mileageMin: number | null = null; // Mindestkilometerstand
+  mileageMax: number | null = null; // Maximalkilometerstand
+  fuelType: string = ''; // Kraftstoffart
+  color: string = ''; // Farbe des Fahrzeugs
+  condition: string = ''; // Zustand (neu/gebraucht)
+
+  isLoading: boolean = false; // Steuert die Ladeanzeige
+  showAdvancedFilters: boolean = false; // Steuerung für erweiterte Filteroptionen
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  // Wird beim Initialisieren der Komponente aufgerufen
   ngOnInit(): void {
-    console.log('CarsComponent initialized');
-    this.loadMarks();  //  Lädt NUR Auto-Marken (selectedCategory)
-    this.loadAllVehicles(); // Lade alle Fahrzeuge beim Start
-    this.loadVehicleTypes();
+    this.loadMarks(); // Lädt Marken für Autos (Kategorie 1)
+    this.loadAllVehicles(); // Lädt alle Fahrzeuge der Kategorie Auto
+    this.loadVehicleTypes(); // Lädt die verfügbaren Fahrzeugtypen
   }
 
+  /**
+   * Zeigt oder versteckt die erweiterten Filteroptionen
+   */
   toggleFilters(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
+  /**
+   * Lädt alle Fahrzeuge der Kategorie Auto
+   */
   loadAllVehicles(): void {
     this.isLoading = true;
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/category/${this.selectedCategory}`).subscribe({
       next: (data) => {
-        console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
 
-        // Lade für jedes Fahrzeug die zugehörigen Bilder
+        // Lade Bilder für jedes Fahrzeug
         this.vehicles.forEach(vehicle => {
           this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
-              .subscribe({
-                next: (images) => {
-                  vehicle.pictures = images;
-                },
-                error: (error) => {
-                  console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
-                }
-              });
+            .subscribe({
+              next: (images) => {
+                vehicle.pictures = images;
+              },
+              error: (error) => {
+                console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+              }
+            });
         });
 
         this.isLoading = false;
@@ -75,8 +83,9 @@ export class CarsComponent implements OnInit {
     });
   }
 
-
-  // Lädt nur die Marken der Kategorie Auto (categoryId=1)
+  /**
+   * Lädt nur die Fahrzeugmarken der Kategorie Auto (categoryId=1)
+   */
   loadMarks(): void {
     this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
       next: (data) => {
@@ -88,7 +97,9 @@ export class CarsComponent implements OnInit {
     });
   }
 
-  // Lädt Modelle basierend auf der ausgewählten Marke
+  /**
+   * Lädt Fahrzeugmodelle basierend auf der ausgewählten Marke
+   */
   loadModels(): void {
     if (!this.selectedMarke) {
       this.models = [];
@@ -104,6 +115,9 @@ export class CarsComponent implements OnInit {
     });
   }
 
+  /**
+   * Lädt Fahrzeugtypen basierend auf der Kategorie
+   */
   loadVehicleTypes(): void {
     this.http.get<any[]>(`http://localhost:3000/api/types/${this.selectedCategory}`).subscribe({
       next: (data) => {
@@ -115,6 +129,9 @@ export class CarsComponent implements OnInit {
     });
   }
 
+  /**
+   * Führt eine Suche mit den ausgewählten Filtern durch
+   */
   searchVehicles(): void {
     this.isLoading = true;
     let queryParams = new URLSearchParams();
@@ -137,32 +154,35 @@ export class CarsComponent implements OnInit {
     }
 
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/searchMark/listings?${queryParams.toString()}`)
-        .subscribe({
-          next: (data) => {
-            this.vehicles = data;
+      .subscribe({
+        next: (data) => {
+          this.vehicles = data;
 
-            // Lade für jedes Fahrzeug die zugehörigen Bilder
-            this.vehicles.forEach(vehicle => {
-              this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
-                  .subscribe({
-                    next: (images) => {
-                      vehicle.pictures = images;
-                    },
-                    error: (error) => {
-                      console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
-                    }
-                  });
-            });
+          // Lade für jedes Fahrzeug die zugehörigen Bilder
+          this.vehicles.forEach(vehicle => {
+            this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
+              .subscribe({
+                next: (images) => {
+                  vehicle.pictures = images;
+                },
+                error: (error) => {
+                  console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
+                }
+              });
+          });
 
-            this.isLoading = false;
-          },
-          error: (error) => {
-            console.error('Fehler beim Abrufen der Fahrzeuge:', error);
-            this.isLoading = false;
-          },
-        });
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Fehler beim Abrufen der Fahrzeuge:', error);
+          this.isLoading = false;
+        },
+      });
   }
 
+  /**
+   * Setzt alle Filter zurück und lädt alle Fahrzeuge erneut
+   */
   resetFilters(): void {
     this.selectedMarke = '';
     this.selectedModel = '';

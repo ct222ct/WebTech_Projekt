@@ -1,60 +1,69 @@
+// Importiert die benötigten Angular-Module für HTTP-Anfragen, Formulare und Routing
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {Router, RouterLink} from "@angular/router";
+import { NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 
+// Deklariert die Fahrzeug-Kategorie "Motorräder" als eigenständige Komponente
 @Component({
-  selector: 'app-motorbikes',
-  templateUrl: './motorbikes.component.html',
-  styleUrls: ['./motorbikes.component.less'],
+  selector: 'app-motorbikes', // Definiert den CSS-Selektor für die Komponente
+  templateUrl: './motorbikes.component.html', // Verweist auf die HTML-Template-Datei der Komponente
+  styleUrls: ['./motorbikes.component.less'], // Verweist auf die zugehörige Stylesheet-Datei
   standalone: true,
-  imports: [FormsModule, NgForOf, NgIf, RouterLink],
+  imports: [FormsModule, NgForOf, NgIf, RouterLink], // Importiert Formulare, Direktiven und RouterLink
 })
-
 export class MotorbikesComponent implements OnInit {
-  vehicles: any[] = [];
-  marks: any[] = [];   // 🚀 Enthält NUR Marken der Kategorie Motorrad (2)
-  models: any[] = [];
-  vehicleTypes: any[] = [];
-  selectedCategory: string = '2'; // Default: Motorräder
-  selectedMarke: string = '';
-  selectedModel: string = '';
-  selectedVehicleType: string = '';
-  priceMin: number | null = null;
-  priceMax: number | null = null;
-  sellerCity: string = '';
-  mileageMin: number | null = null;
-  mileageMax: number | null = null;
-  firstRegistrationMin: string = '';
-  firstRegistrationMax: string = '';
-  fuelType: string = '';
-  color: string = '';
-  condition: string = '';
-  isLoading: boolean = false;
-  showAdvancedFilters: boolean = false;
+  vehicles: any[] = []; // Speichert die geladenen Motorräder
+  marks: any[] = []; // Speichert die Motorradmarken
+  models: any[] = []; // Speichert die Motorradmodelle
+  vehicleTypes: any[] = []; // Speichert die Motorradtypen
+
+  // Suchfilter-Optionen
+  selectedCategory: string = '2'; // Standardmäßig Motorräder (Kategorie 2)
+  selectedMarke: string = ''; // Ausgewählte Marke
+  selectedModel: string = ''; // Ausgewähltes Modell
+  selectedVehicleType: string = ''; // Ausgewählter Fahrzeugtyp
+  priceMin: number | null = null; // Mindestpreis
+  priceMax: number | null = null; // Maximalpreis
+  sellerCity: string = ''; // Stadt des Verkäufers
+  mileageMin: number | null = null; // Mindestkilometerstand
+  mileageMax: number | null = null; // Maximalkilometerstand
+  firstRegistrationMin: string = ''; // Frühestes Baujahr
+  firstRegistrationMax: string = ''; // Spätestes Baujahr
+  fuelType: string = ''; // Kraftstoffart
+  color: string = ''; // Farbe des Motorrads
+  condition: string = ''; // Zustand (neu/gebraucht)
+
+  isLoading: boolean = false; // Steuert die Ladeanzeige
+  showAdvancedFilters: boolean = false; // Steuerung für erweiterte Filteroptionen
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  // Wird beim Initialisieren der Komponente aufgerufen
   ngOnInit(): void {
-    console.log('MotorcyclesComponent initialized');
-    this.loadMarks();  // Lädt NUR Motorrad-Marken (selectedCategory = 2)
-    this.loadAllVehicles(); // Lade alle Motorräder beim Start
-    this.loadVehicleTypes();
+    this.loadMarks(); // Lädt Marken für Motorräder (Kategorie 2)
+    this.loadAllVehicles(); // Lädt alle Motorräder der Kategorie
+    this.loadVehicleTypes(); // Lädt die verfügbaren Motorradtypen
   }
 
+  /**
+   * Zeigt oder versteckt die erweiterten Filteroptionen
+   */
   toggleFilters(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
+  /**
+   * Lädt alle Fahrzeuge der Kategorie Motorräder
+   */
   loadAllVehicles(): void {
     this.isLoading = true;
     this.http.get<any[]>(`http://localhost:3000/api/vehicles/category/${this.selectedCategory}`).subscribe({
       next: (data) => {
-        console.log('Geladene Fahrzeuge:', data);
         this.vehicles = data;
 
-        // 🚀 Lade für jedes Fahrzeug die zugehörigen Bilder
+        // Lade Bilder für jedes Fahrzeug
         this.vehicles.forEach(vehicle => {
           this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
             .subscribe({
@@ -76,8 +85,9 @@ export class MotorbikesComponent implements OnInit {
     });
   }
 
-
-  // Lädt nur die Marken der Kategorie Motorrad (categoryId=2)
+  /**
+   * Lädt nur die Motorradmarken der Kategorie Motorrad (categoryId=2)
+   */
   loadMarks(): void {
     this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
       next: (data) => {
@@ -89,7 +99,9 @@ export class MotorbikesComponent implements OnInit {
     });
   }
 
-  // Lädt Modelle basierend auf der ausgewählten Motorrad-Marke
+  /**
+   * Lädt Motorradmodelle basierend auf der ausgewählten Marke
+   */
   loadModels(): void {
     if (!this.selectedMarke) {
       this.models = [];
@@ -98,7 +110,6 @@ export class MotorbikesComponent implements OnInit {
     this.http.get<any[]>(`http://localhost:3000/api/models/${this.selectedMarke}`).subscribe({
       next: (data) => {
         this.models = data;
-        console.log('Geladene Motorrad-Modelle:', this.models);
       },
       error: (error) => {
         console.error('Fehler beim Laden der Modelle:', error);
@@ -106,6 +117,9 @@ export class MotorbikesComponent implements OnInit {
     });
   }
 
+  /**
+   * Lädt Fahrzeugtypen basierend auf der Kategorie
+   */
   loadVehicleTypes(): void {
     this.http.get<any[]>(`http://localhost:3000/api/types/${this.selectedCategory}`).subscribe({
       next: (data) => {
@@ -117,6 +131,9 @@ export class MotorbikesComponent implements OnInit {
     });
   }
 
+  /**
+   * Führt eine Suche mit den ausgewählten Filtern durch
+   */
   searchVehicles(): void {
     this.isLoading = true;
     let queryParams = new URLSearchParams();
@@ -128,6 +145,8 @@ export class MotorbikesComponent implements OnInit {
     if (this.priceMax) queryParams.append('priceMax', this.priceMax.toString());
     if (this.mileageMin) queryParams.append('mileageMin', this.mileageMin.toString());
     if (this.mileageMax) queryParams.append('mileageMax', this.mileageMax.toString());
+    if (this.firstRegistrationMin) queryParams.append('firstRegistrationMin', this.firstRegistrationMin);
+    if (this.firstRegistrationMax) queryParams.append('firstRegistrationMax', this.firstRegistrationMax);
     if (this.sellerCity) queryParams.append('city', this.sellerCity);
     if (this.fuelType) queryParams.append('fuelType', this.fuelType);
     if (this.color) queryParams.append('color', this.color);
@@ -165,6 +184,9 @@ export class MotorbikesComponent implements OnInit {
       });
   }
 
+  /**
+   * Setzt alle Filter zurück und lädt alle Motorräder erneut
+   */
   resetFilters(): void {
     this.selectedMarke = '';
     this.selectedModel = '';
@@ -174,6 +196,8 @@ export class MotorbikesComponent implements OnInit {
     this.sellerCity = '';
     this.mileageMin = null;
     this.mileageMax = null;
+    this.firstRegistrationMin = '';
+    this.firstRegistrationMax = '';
     this.fuelType = '';
     this.color = '';
     this.condition = '';

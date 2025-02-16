@@ -1,41 +1,42 @@
+// Importiert die benötigten Angular-Module und Services
 import { Component, OnInit } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserService } from '../services/user.service';
-import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
-import {FormsModule} from '@angular/forms'; // Import UserService
+import { NgForOf, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Ermöglicht Zwei-Wege-Datenbindung
 
+// Deklariert die Metadaten für die Verkäufer-Fahrzeuglisten-Komponente
 @Component({
-  selector: 'app-seller-listings',
-  templateUrl: './seller-listings.component.html',
-  styleUrls: ['./seller-listings.component.less'],
+  selector: 'app-seller-listings', // Definiert den CSS-Selektor für die Komponente
+  templateUrl: './seller-listings.component.html', // Verweist auf die HTML-Template-Datei der Komponente
+  styleUrls: ['./seller-listings.component.less'], // Verweist auf die zugehörige Stylesheet-Datei
   imports: [
-    NgIf,
-    NgForOf,
-    FormsModule
+    NgIf, // Ermöglicht die Nutzung von *ngIf in der HTML-Datei
+    NgForOf, // Ermöglicht die Nutzung von *ngFor für Listen
+    FormsModule // Ermöglicht Formulareingaben und Zwei-Wege-Datenbindung
   ]
 })
 export class SellerListingsComponent implements OnInit {
-  isLoading: boolean = true;
-  user: any = null;
-  vehicles: any[] = [];
-  isModalOpen: boolean = false; // Controls modal visibility
-  models: any[] = []; // Models from DB
-  types: any[] = []; // Types from DB
-  marks: any[] = []; // Marken aus der DB
-  categories: any[] = []; // Kategorien aus der DB
+  isLoading: boolean = true; // Steuert den Ladezustand der Daten
+  user: any = null; // Speichert die Benutzerinformationen
+  vehicles: any[] = []; // Liste der Fahrzeuge des Verkäufers
+  isModalOpen: boolean = false; // Steuert die Sichtbarkeit des Modals für Fahrzeugerstellung
+  models: any[] = []; // Speichert Modell-Daten aus der DB
+  types: any[] = []; // Speichert Fahrzeugtypen aus der DB
+  marks: any[] = []; // Speichert Fahrzeugmarken aus der DB
+  categories: any[] = []; // Speichert Fahrzeugkategorien aus der DB
 
+  selectedCategory: string = ''; // Ausgewählte Kategorie
+  selectedMarkId: string = ''; // Ausgewählte Marke
 
-  selectedCategory: string = ''; // Kategorie auswählen
-  selectedMarkId: string = ''; // Marke auswählen
-  //selectedModel: string = ''; // Modell auswählen
-
+  // Neues Fahrzeugobjekt für die Erstellung
   newVehicle: any = {
-    categoryId: '', // Will be selected from dropdown
-    userId: '', // Will be set from user data
-    markId: '', // Will be selected from dropdown
+    categoryId: '',
+    userId: '',
+    markId: '',
     name: '',
-    modelId: '', // Will be selected from dropdown
-    typeId: '', // Will be selected from dropdown
+    modelId: '',
+    typeId: '',
     description: '',
     price: 0,
     dateOfFirstRegistration: '',
@@ -45,23 +46,24 @@ export class SellerListingsComponent implements OnInit {
     condition: '',
     images: []
   };
-  selectedImages: File[] = [];
+  selectedImages: File[] = []; // Speichert ausgewählte Bilder
 
-  editedVehicle: any = {}; // Hier werden die vorhandenen Fahrzeugdaten gespeichert
+  editedVehicle: any = {}; // Speichert das aktuell zu bearbeitende Fahrzeug
   isEditModalOpen: boolean = false; // Steuert die Sichtbarkeit des Bearbeitungsmodals
 
   constructor(private http: HttpClient, private userService: UserService) {}
 
+  // Wird beim Initialisieren der Komponente aufgerufen
   ngOnInit(): void {
     this.loadUserAndListings();
     this.loadCategories();
-
   }
 
+  // Lädt Benutzerdaten und die Fahrzeuglisten
   loadUserAndListings(): void {
     this.userService.getUserData().subscribe({
       next: (user) => {
-        console.log('Benutzer erfolgreich geladen:', user);
+        this.user = user;
         this.fetchSellerListings();
       },
       error: (err) => {
@@ -71,13 +73,13 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Lädt die Fahrzeugliste des Verkäufers
   fetchSellerListings(): void {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.get<any[]>('http://localhost:3000/api/vehicles/seller/listings', { headers }).subscribe({
       next: (data) => {
-        console.log('Empfangene Fahrzeugdaten:', data);
         this.vehicles = data;
 
         // Lade Bilder für jedes Fahrzeug
@@ -85,11 +87,10 @@ export class SellerListingsComponent implements OnInit {
           this.http.get<any[]>(`http://localhost:3000/api/vehicles/images/${vehicle.id}`)
             .subscribe({
               next: (images) => {
-                vehicle.pictures = images; // Setzt das Bild-Array für das Fahrzeug
+                vehicle.pictures = images;
               },
-              error: (error) => {
-                console.error(`Fehler beim Abrufen der Bilder für Fahrzeug ${vehicle.id}:`, error);
-                vehicle.pictures = []; // Falls kein Bild gefunden wurde, leer setzen
+              error: () => {
+                vehicle.pictures = []; // Falls kein Bild vorhanden, leeres Array setzen
               }
             });
         });
@@ -103,37 +104,35 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Markiert ein Fahrzeug als verkauft
   markAsSold(vehicleId: number): void {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.put(`http://localhost:3000/api/vehicles/mark-sold/${vehicleId}`, {}, { headers })
       .subscribe({
-        next: () => {
-          console.log(`Vehicle ${vehicleId} marked as sold`);
-          this.loadUserAndListings(); // Refresh list
-        },
-        error: (err) => console.error('Error marking vehicle as sold:', err),
+        next: () => this.loadUserAndListings(),
+        error: (err) => console.error('Fehler beim Markieren als verkauft:', err),
       });
   }
 
+  // Öffnet das Modal für das Hinzufügen eines Fahrzeugs
   openModal(): void {
     this.isModalOpen = true;
-    this.selectedCategory = ''; // Reset der Auswahl
+    this.selectedCategory = '';
     this.selectedMarkId = '';
-    this.newVehicle.modelId = '';
-    this.newVehicle.typeId = '';
   }
 
+  // Schließt das Modal für das Hinzufügen eines Fahrzeugs
   closeModal(): void {
     this.isModalOpen = false;
   }
 
+  // Lädt die Fahrzeugkategorien
   loadCategories(): void {
     this.http.get<any[]>('http://localhost:3000/api/categories').subscribe({
       next: (data) => {
         this.categories = data;
-        console.log('Geladene Kategorien:', this.categories);
       },
       error: (error) => {
         console.error('Fehler beim Laden der Kategorien:', error);
@@ -141,14 +140,13 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Lädt Marken basierend auf der gewählten Kategorie
   loadMarks(): void {
-    if (!this.selectedCategory) return; // Falls keine Kategorie ausgewählt ist, nichts laden
+    if (!this.selectedCategory) return;
 
     this.http.get<any[]>(`http://localhost:3000/api/marks/${this.selectedCategory}`).subscribe({
       next: (data) => {
         this.marks = data;
-        this.selectedMarkId = '';
-        this.models = []; // Zurücksetzen der Modelle
       },
       error: (error) => {
         console.error('Fehler beim Laden der Marken:', error);
@@ -156,13 +154,13 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Lädt Modelle basierend auf der gewählten Marke
   loadModels(): void {
     if (!this.selectedMarkId) return;
 
     this.http.get<any[]>(`http://localhost:3000/api/models/${this.selectedMarkId}`).subscribe({
       next: (data) => {
         this.models = data;
-        this.newVehicle.modelId = '';
       },
       error: (error) => {
         console.error('Fehler beim Laden der Modelle:', error);
@@ -170,13 +168,13 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Lädt Fahrzeugtypen basierend auf der gewählten Kategorie
   loadTypes(): void {
     if (!this.selectedCategory) return;
 
     this.http.get<any[]>(`http://localhost:3000/api/types/${this.selectedCategory}`).subscribe({
       next: (data) => {
         this.types = data;
-        this.newVehicle.typeId = '';
       },
       error: (error) => {
         console.error('Fehler beim Laden der Typen:', error);
@@ -184,6 +182,7 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Fügt ein neues Fahrzeug hinzu
   addVehicle(): void {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -191,34 +190,23 @@ export class SellerListingsComponent implements OnInit {
       return;
     }
     this.newVehicle.categoryId = this.selectedCategory;
-    //this.newVehicle.userId = this.user.id;
     this.newVehicle.markId = this.selectedMarkId;
 
     const formData = new FormData();
-    formData.append('name', this.newVehicle.name);
-    formData.append('modelId', this.newVehicle.modelId);
-    formData.append('typeId', this.newVehicle.typeId);
-    formData.append('markId', this.newVehicle.markId);
-    formData.append('categoryId', this.newVehicle.categoryId);
-    formData.append('description', this.newVehicle.description);
-    formData.append('price', this.newVehicle.price.toString());
-    formData.append('dateOfFirstRegistration', this.newVehicle.dateOfFirstRegistration);
-    formData.append('mileage', this.newVehicle.mileage.toString());
-    formData.append('fuelType', this.newVehicle.fuelType);
-    formData.append('color', this.newVehicle.color);
-    formData.append('condition', this.newVehicle.condition);
+    Object.keys(this.newVehicle).forEach(key => {
+      formData.append(key, this.newVehicle[key]);
+    });
 
-    this.selectedImages.forEach((file, index) => {
-      formData.append(`images`, file);
+    this.selectedImages.forEach(file => {
+      formData.append('images', file);
     });
 
     this.http.post('http://localhost:3000/api/vehicles', formData, {
-      headers: new HttpHeaders({Authorization: `Bearer ${token}`})
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
     }).subscribe({
-      next: (response) => {
-        console.log('Fahrzeug erfolgreich hinzugefügt:', response);
+      next: () => {
         this.selectedImages = [];
-        this.closeModal()
+        this.closeModal();
       },
       error: (error) => {
         console.error('Fehler beim Hinzufügen des Fahrzeugs:', error);
@@ -226,61 +214,41 @@ export class SellerListingsComponent implements OnInit {
     });
   }
 
+  // Wählt Bilder für den Upload aus
   onFileSelected(event: any): void {
     this.selectedImages = Array.from(event.target.files);
   }
 
+  // Öffnet das Bearbeitungsmodal für ein Fahrzeug
   openEditModal(vehicle: any): void {
-    this.editedVehicle = { ...vehicle }; // Kopie der Fahrzeugdaten speichern
+    this.editedVehicle = { ...vehicle };
     this.isEditModalOpen = true;
   }
 
+  // Schließt das Bearbeitungsmodal
   closeEditModal(): void {
     this.isEditModalOpen = false;
   }
 
+  // Aktualisiert ein Fahrzeug
   updateVehicle(): void {
-    const token = localStorage.getItem('token'); // Token aus LocalStorage abrufen
-    if (!token) {
-      console.error('Kein Token gefunden!');
-      return;
-    }
-
+    const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
     this.http.put(`http://localhost:3000/api/vehicles/${this.editedVehicle.id}`, this.editedVehicle, { headers })
-      .subscribe({
-        next: () => {
-          console.log('Fahrzeug erfolgreich aktualisiert.');
-          this.fetchSellerListings(); // Fahrzeugliste neu laden
-          this.closeEditModal(); // Modal schließen
-        },
-        error: (error) => {
-          console.error('Fehler beim Aktualisieren des Fahrzeugs:', error);
-        }
+      .subscribe(() => {
+        this.fetchSellerListings();
+        this.closeEditModal();
       });
   }
 
+  // Löscht ein Fahrzeug
   deleteVehicle(vehicleId: number): void {
-    const token = localStorage.getItem('token'); // 🔹 Token abrufen
-    if (!token) {
-      console.error('Kein Token gefunden im LocalStorage');
-      return;
-    }
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
-
-    this.http.delete(`http://localhost:3000/api/vehicles/${vehicleId}`, { headers }).subscribe({
-      next: () => {
-        this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
-        console.log('Fahrzeug erfolgreich gelöscht:', vehicleId);
-      },
-      error: (error) => {
-        console.error('Fehler beim Löschen des Fahrzeugs:', error);
-      }
+    this.http.delete(`http://localhost:3000/api/vehicles/delete/${vehicleId}`, { headers }).subscribe(() => {
+      this.vehicles = this.vehicles.filter(v => v.id !== vehicleId);
     });
   }
-
 }

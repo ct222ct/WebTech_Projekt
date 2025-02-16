@@ -15,8 +15,15 @@
   <div *ngIf="!isLoading && vehicles.length > 0" class="listings">
     <div *ngFor="let vehicles of vehicles" class="listing-card">
       <h3>{{ vehicles.name }}</h3>
-      <p><strong>Beschreibung:</strong> {{ vehicles.description }}</p>
+      <p><strong>Marke:</strong> {{ vehicles.markId || 'Nicht verfügbar' }}</p>
+      <p><strong>Modell:</strong> {{ vehicles.modelId || 'Nicht verfügbar' }}</p>
       <p><strong>Preis:</strong> {{ vehicles.price }} €</p>
+      <p><strong>Kilometerstand:</strong> {{ vehicles.mileage }} km</p>
+      <p><strong>Erstzulassung:</strong> {{ vehicles.dateOfFirstRegistration }}</p>
+      <p><strong>Farbe:</strong> {{ vehicles.color }}</p>
+      <p><strong>Kraftstoffart:</strong> {{ vehicles.fuelType }}</p>
+      <p><strong>Zustand:</strong> {{ vehicles.condition }}</p>
+      <p><strong>Beschreibung:</strong> {{ vehicles.description }}</p>
       <div *ngIf="vehicles.pictures?.length">
         <img *ngFor="let image of vehicles.pictures" [src]="image.url" width="150" height="100" alt="Fahrzeugbild">
       </div>

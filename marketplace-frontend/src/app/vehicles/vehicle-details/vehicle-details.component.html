@@ -17,9 +17,9 @@
     </div>
 
     <h3>{{ vehicle.name }}</h3>
-    <p><strong>Verkäufer:</strong> {{ userEmail || 'Unbekannt' }}</p>
-    <p><strong>Marke:</strong> {{ vehicle.markId || 'Nicht verfügbar' }}</p>
-    <p><strong>Modell:</strong> {{ vehicle.modelId || 'Nicht verfügbar' }}</p>
+    <p><strong>Verkäufer:</strong> {{ vehicle.userId }}</p>
+    <p><strong>Marke:</strong> {{ vehicle.markId }}</p>
+    <p><strong>Modell:</strong> {{ vehicle.modelId }}</p>
     <p><strong>Preis:</strong> {{ vehicle.price }} €</p>
     <p><strong>Kilometerstand:</strong> {{ vehicle.mileage }} km</p>
     <p><strong>Erstzulassung:</strong> {{ vehicle.dateOfFirstRegistration }}</p>
@@ -28,9 +28,13 @@
     <p><strong>Zustand:</strong> {{ vehicle.condition }}</p>
     <p><strong>Beschreibung:</strong> {{ vehicle.description }}</p>
 
+    <!-- Button zum Anzeigen des Chats -->
+    <button (click)="toggleChat()">
+      {{ chatVisible ? 'Chat ausblenden' : 'Chat starten' }}
+    </button>
 
-    <!-- 🚀 Chat Box -->
-    <div class="chat-container">
+    <!-- Chat Box (wird nur angezeigt, wenn chatVisible = true) -->
+    <div *ngIf="chatVisible" class="chat-container">
       <h3>Chat mit Verkäufer</h3>
       <div class="chat-messages">
         <div *ngFor="let message of messages" class="{{ message.senderId === userId ? 'sent' : 'received' }}">
